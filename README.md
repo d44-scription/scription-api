@@ -56,14 +56,22 @@ $ docker-compose run --rm web bundle exec rspec
   > X examples, Y failures, Z pending
 ```
 
-This can also accept a path or can be filtered to run only specs that failed in previous runs using the following options:
+This can also accept a path or can be filtered to run:
+
+1. only specs that failed in previous runs
+2. all specs found in a path
+3. a specific example in a given suite
 
 ```bash
+$ docker-compose run --rm web bundle exec rspec --only-failures
+  > Finished in X seconds (files took Y seconds to load)
+  > X examples, Y failures, Z pending
+
 $ docker-compose run --rm web bundle exec rspec spec/requests
   > Finished in X seconds (files took Y seconds to load)
   > X examples, Y failures, Z pending
 
-$ docker-compose run --rm web bundle exec rspec --only-failures
+$ docker-compose run --rm web bundle exec rspec spec/requests/notebooks_spec.rb:19
   > Finished in X seconds (files took Y seconds to load)
   > X examples, Y failures, Z pending
 ```
