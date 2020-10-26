@@ -25,6 +25,10 @@ group :development, :test do
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
   # Use RSpec test framework
   gem 'rspec-rails', '~> 4.0.1'
+  # Use collection matchers for RSpec
+  gem 'rspec-collection_matchers', '~> 1.1', '>= 1.1.2'
+  # Print a report of the test coverage %
+  gem 'simplecov', '~> 0.19.1'
   # Use FactoryBot to create test data
   gem 'factory_bot_rails', '~> 5.0', '>= 5.0.2'
 end
