@@ -1,6 +1,6 @@
-# COMP3000-scription-web
+# COMP3000-scription-api
 
-Web application component of the Scription application
+API for the Scription application
 
 ## Running locally
 
