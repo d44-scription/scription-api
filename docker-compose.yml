@@ -9,7 +9,7 @@ services:
     image: postgres:13
     environment:
       PGDATA: /var/lib/postgresql/data/pgdata
-      POSTGRES_DB: usrname_development
+      POSTGRES_DB: scription-api_development
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: superSecret123
     volumes:
