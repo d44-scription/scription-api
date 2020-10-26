@@ -44,4 +44,4 @@ $ docker-compose run --rm web bundle exec rubocop
   > X files inspected, Y offenses detected, Z offenses auto-correctable
 ```
 
-As the output states, a number of these can be autocorrected by adding `-a` to the end of the command.
+As the output states, a number of these can be autocorrected by adding `-A` to the end of the command.

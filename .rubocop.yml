@@ -1,0 +1,12 @@
+AllCops:
+  TargetRubyVersion: 2.7
+  Exclude:
+    - 'db/**/*'
+    - 'config/**/*'
+    - 'bin/**/*'
+
+Layout/LineLength:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
