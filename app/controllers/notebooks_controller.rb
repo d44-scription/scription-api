@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class NotebooksController < ApplicationController
-  before_action :set_notebook, only: [:show, :update, :destroy]
+  before_action :set_notebook, only: %i[show update destroy]
 
   # GET /notebooks
   # GET /notebooks.json
@@ -9,8 +11,7 @@ class NotebooksController < ApplicationController
 
   # GET /notebooks/1
   # GET /notebooks/1.json
-  def show
-  end
+  def show; end
 
   # POST /notebooks
   # POST /notebooks.json
@@ -41,13 +42,14 @@ class NotebooksController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_notebook
-      @notebook = Notebook.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def notebook_params
-      params.require(:notebook).permit(:name)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_notebook
+    @notebook = Notebook.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def notebook_params
+    params.require(:notebook).permit(:name)
+  end
 end

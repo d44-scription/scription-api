@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :notebook do
-    name { "MyString" }
+    sequence(:name) { |n| "Notebook #{n}" }
   end
 end
