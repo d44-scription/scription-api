@@ -45,3 +45,25 @@ $ docker-compose run --rm web bundle exec rubocop
 ```
 
 As the output states, a number of these can be autocorrected by adding `-A` to the end of the command.
+
+## Running Tests
+
+This app uses RSpec as it's testing framework. To run tests use:
+
+```bash
+$ docker-compose run --rm web bundle exec rspec
+  > Finished in X seconds (files took Y seconds to load)
+  > X examples, Y failures, Z pending
+```
+
+This can also accept a path or can be filtered to run only specs that failed in previous runs using the following options:
+
+```bash
+$ docker-compose run --rm web bundle exec rspec spec/requests
+  > Finished in X seconds (files took Y seconds to load)
+  > X examples, Y failures, Z pending
+
+$ docker-compose run --rm web bundle exec rspec --only-failures
+  > Finished in X seconds (files took Y seconds to load)
+  > X examples, Y failures, Z pending
+```
