@@ -13,7 +13,7 @@ class NotebooksController < ApplicationController
     if @notebook.save
       render :show, status: :created, location: @notebook
     else
-      render json: @notebook.errors, status: :unprocessable_entity
+      render json: @notebook.errors.full_messages, status: :unprocessable_entity
     end
   end
 
@@ -21,7 +21,7 @@ class NotebooksController < ApplicationController
     if @notebook.update(notebook_params)
       render :show, status: :ok, location: @notebook
     else
-      render json: @notebook.errors, status: :unprocessable_entity
+      render json: @notebook.errors.full_messages, status: :unprocessable_entity
     end
   end
 

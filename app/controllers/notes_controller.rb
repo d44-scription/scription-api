@@ -9,20 +9,20 @@ class NotesController < ApplicationController
   end
 
   def create
-    @note = Note.new(note_params)
+    @note = @notebook.notes.new(note_params)
 
     if @note.save
-      render :show, status: :created, location: @note
+      render :show, status: :created
     else
-      render json: @note.errors, status: :unprocessable_entity
+      render json: @note.errors.full_messages, status: :unprocessable_entity
     end
   end
 
   def update
     if @note.update(note_params)
-      render :show, status: :ok, location: @note
+      render :show, status: :ok
     else
-      render json: @note.errors, status: :unprocessable_entity
+      render json: @note.errors.full_messages, status: :unprocessable_entity
     end
   end
 
