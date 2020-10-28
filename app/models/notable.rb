@@ -9,13 +9,11 @@ class Notable < ApplicationRecord
   validates :notebook, presence: true
   validates :name, presence: true
 
-  TYPES = %w[Item]
+  TYPES = %w[Item].freeze
 
   private
 
   def permitted_type
-    unless TYPES.include?(type)
-      errors.add(:type, "must be one of #{TYPES.join('/')}")
-    end
+    errors.add(:type, "must be one of #{TYPES.join('/')}") unless TYPES.include?(type)
   end
 end
