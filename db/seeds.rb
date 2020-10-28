@@ -7,10 +7,15 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 puts('Creating notebooks...')
 3.times do |i|
-  n = Notebook.create(name: "Notebook #{i}")
+  n = Notebook.create!(name: "Notebook #{i}")
 
-  puts("Creating default notes for #{n.name}")
+  puts("  Creating default notes for #{n.name}")
   3.times do |j|
-    n.notes.create(content: "Test note #{i}:#{j}")
+    n.notes.create!(content: "Test note #{i}:#{j}")
+  end
+
+  puts("  Creating default items for #{n.name}")
+  3.times do |j|
+    n.items.create!(name: "Item #{i}:#{j}")
   end
 end

@@ -2,6 +2,7 @@
 
 class Notebook < ApplicationRecord
   has_many :notes
+  has_many :items
 
   validates :name, presence: true
 end
