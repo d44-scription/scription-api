@@ -2,7 +2,7 @@
 
 class NotesController < ApplicationController
   before_action :fetch_notebook
-  before_action :set_note, only: %i[show update destroy]
+  before_action :fetch_note, only: %i[show update destroy]
 
   def index
     @notes = Note.all
@@ -36,7 +36,7 @@ class NotesController < ApplicationController
     @notebook = Notebook.find(params[:notebook_id])
   end
 
-  def set_note
+  def fetch_note
     @note = @notebook.notes.find(params[:id])
   end
 
