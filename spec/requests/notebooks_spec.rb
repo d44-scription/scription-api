@@ -27,11 +27,14 @@ RSpec.describe '/notebooks', type: :request do
   end
 
   describe 'GET /show' do
+    let!(:note) { FactoryBot.create(:note, notebook: existing_notebook) }
+
     it 'renders a successful response' do
       get notebook_url(existing_notebook), as: :json
 
       expect(response).to be_successful
       expect(response.body).to include(existing_notebook.name)
+      expect(response.body).to include(note.content)
     end
   end
 
