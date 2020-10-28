@@ -31,6 +31,7 @@ RSpec.describe Notable, type: :model do
       expect(item).to have(0).errors_on(:name)
       expect(item).to have(0).errors_on(:notebook)
 
+      expect(notebook.items).to include(item)
       expect(item).to be_valid
     end
 
