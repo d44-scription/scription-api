@@ -3,10 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe '/notebooks', type: :request do
+  let!(:existing_notebook) { FactoryBot.create(:notebook) }
+
   let(:valid_attributes) { FactoryBot.attributes_for(:notebook) }
   let(:invalid_attributes) { FactoryBot.attributes_for(:notebook, name: nil) }
-
-  let!(:existing_notebook) { FactoryBot.create(:notebook) }
 
   # This should return the minimal set of values that should be in the headers
   # in order to pass any filters (e.g. authentication) defined in
@@ -27,11 +27,14 @@ RSpec.describe '/notebooks', type: :request do
   end
 
   describe 'GET /show' do
+    let!(:note) { FactoryBot.create(:note, notebook: existing_notebook) }
+
     it 'renders a successful response' do
       get notebook_url(existing_notebook), as: :json
 
       expect(response).to be_successful
       expect(response.body).to include(existing_notebook.name)
+      expect(response.body).to include(note.content)
     end
   end
 
@@ -67,6 +70,8 @@ RSpec.describe '/notebooks', type: :request do
 
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json; charset=utf-8')
+
+        expect(response.body).to include('Name can\'t be blank')
       end
     end
   end
@@ -102,6 +107,7 @@ RSpec.describe '/notebooks', type: :request do
 
         existing_notebook.reload
         expect(existing_notebook.name).not_to eql('Updated Notebook')
+        expect(response.body).to include('Name can\'t be blank')
       end
     end
   end
