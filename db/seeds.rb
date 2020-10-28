@@ -5,6 +5,12 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+puts('Creating notebooks...')
 3.times do |i|
-  Notebook.create(name: "Notebook #{i}")
+  n = Notebook.create(name: "Notebook #{i}")
+
+  puts("Creating default notes for #{n.name}")
+  3.times do |j|
+    n.notes.create(contents: "Test note #{i}:#{j}")
+  end
 end
