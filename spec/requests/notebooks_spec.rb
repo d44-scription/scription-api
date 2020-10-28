@@ -3,10 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe '/notebooks', type: :request do
+  let!(:existing_notebook) { FactoryBot.create(:notebook) }
+
   let(:valid_attributes) { FactoryBot.attributes_for(:notebook) }
   let(:invalid_attributes) { FactoryBot.attributes_for(:notebook, name: nil) }
-
-  let!(:existing_notebook) { FactoryBot.create(:notebook) }
 
   # This should return the minimal set of values that should be in the headers
   # in order to pass any filters (e.g. authentication) defined in

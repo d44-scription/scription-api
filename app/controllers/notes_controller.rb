@@ -5,7 +5,7 @@ class NotesController < ApplicationController
   before_action :fetch_note, only: %i[show update destroy]
 
   def index
-    @notes = Note.all
+    @notes = @notebook.notes
   end
 
   def create
