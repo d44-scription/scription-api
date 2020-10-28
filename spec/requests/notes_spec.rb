@@ -30,4 +30,23 @@ RSpec.describe '/notes', type: :request do
       expect(response.body).not_to include(valid_attributes[:contents])
     end
   end
+
+  describe 'GET /show' do
+    it 'renders a successful response when note is linked to given notebook' do
+      get notebook_note_url(notebook_1, note_1), as: :json
+
+      expect(response).to be_successful
+      expect(response.body).to include(note_1.contents)
+      expect(response.body).not_to include(note_2.contents)
+      expect(response.body).not_to include(valid_attributes[:contents])
+    end
+  end
+
+  describe 'DELETE /destroy' do
+    it 'destroys only the requested note' do
+      expect do
+        delete notebook_note_url(notebook_1, note_1), headers: valid_headers, as: :json
+      end.to change(Note, :count).by(-1)
+    end
+  end
 end
