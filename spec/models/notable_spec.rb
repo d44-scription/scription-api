@@ -27,12 +27,16 @@ RSpec.describe Notable, type: :model do
   context 'when an item' do
     let!(:item) { FactoryBot.build(:notable, :item, notebook: notebook) }
     it 'is valid when attributes are correct' do
+      expect(notebook.items).to be_empty
+
       expect(item).to have(0).errors_on(:type)
       expect(item).to have(0).errors_on(:name)
       expect(item).to have(0).errors_on(:notebook)
 
-      expect(notebook.items).to include(item)
       expect(item).to be_valid
+
+      item.save
+      expect(notebook.items).not_to be_empty
     end
 
     it 'is invalid when no name is given' do
