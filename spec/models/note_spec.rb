@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe Note, type: :model do
   let!(:notebook) { FactoryBot.create(:notebook) }
-  let!(:note) { FactoryBot.build(:note, notebook: notebook)}
+  let!(:note) { FactoryBot.build(:note, notebook: notebook) }
 
   it 'is valid when attributes are correct' do
     expect(note).to have(0).errors_on(:content)
@@ -43,7 +43,7 @@ RSpec.describe Note, type: :model do
     expect(note).not_to be_valid
   end
 
-  it 'is not valid when content is too short' do
+  it 'is not valid when content is too long' do
     note.content = '1' * 501
 
     expect(note).to have(1).errors_on(:content)
