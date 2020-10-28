@@ -104,6 +104,7 @@ RSpec.describe '/notebooks', type: :request do
 
         existing_notebook.reload
         expect(existing_notebook.name).not_to eql('Updated Notebook')
+        expect(response.body).to include('Name can\'t be blank')
       end
     end
   end

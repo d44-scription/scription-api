@@ -85,6 +85,50 @@ RSpec.describe '/notes', type: :request do
     end
   end
 
+  describe 'PATCH /update' do
+    context 'with valid parameters' do
+      let(:new_attributes) { FactoryBot.attributes_for(:note, notebook: notebook_1, contents: 'Updated Note') }
+
+      it 'updates the requested note' do
+        expect do
+          patch notebook_note_url(notebook_1, note_1),
+                params: new_attributes, headers: valid_headers, as: :json
+        end.to change(notebook_1.notes, :count).by(0)
+
+        note_1.reload
+        expect(note_1.contents).to eql('Updated Note')
+      end
+
+      it 'renders a JSON response with the note' do
+        expect do
+          patch notebook_note_url(notebook_1, note_1),
+                params: new_attributes, headers: valid_headers, as: :json
+        end.to change(notebook_1.notes, :count).by(0)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.content_type).to eq('application/json; charset=utf-8')
+      end
+    end
+
+    context 'with invalid parameters' do
+      it 'renders a JSON response with errors for the note' do
+        expect do
+          patch notebook_note_url(notebook_1, note_1),
+                params: invalid_attributes, headers: valid_headers, as: :json
+        end.to change(notebook_1.notes, :count).by(0)
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.content_type).to eq('application/json; charset=utf-8')
+
+        note_1.reload
+        expect(note_1.contents).to eql('Note 1')
+
+        expect(response.body).to include('Contents can\'t be blank')
+        expect(response.body).to include('Contents is too short (minimum is 5 characters)')
+      end
+    end
+  end
+
   describe 'DELETE /destroy' do
     it 'destroys only the requested note' do
       expect do
