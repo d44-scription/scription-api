@@ -6,11 +6,11 @@ RSpec.describe '/notes', type: :request do
   let!(:notebook_1) { FactoryBot.create(:notebook) }
   let!(:notebook_2) { FactoryBot.create(:notebook) }
 
-  let!(:note_1) { FactoryBot.create(:note, notebook: notebook_1, contents: 'Note 1') }
-  let!(:note_2) { FactoryBot.create(:note, notebook: notebook_2, contents: 'Note 2') }
+  let!(:note_1) { FactoryBot.create(:note, notebook: notebook_1, content: 'Note 1') }
+  let!(:note_2) { FactoryBot.create(:note, notebook: notebook_2, content: 'Note 2') }
 
-  let(:valid_attributes) { FactoryBot.attributes_for(:note, notebook: notebook_1, contents: 'New Note') }
-  let(:invalid_attributes) { FactoryBot.attributes_for(:note, contents: nil) }
+  let(:valid_attributes) { FactoryBot.attributes_for(:note, notebook: notebook_1, content: 'New Note') }
+  let(:invalid_attributes) { FactoryBot.attributes_for(:note, content: nil) }
 
   # This should return the minimal set of values that should be in the headers
   # in order to pass any filters (e.g. authentication) defined in
@@ -25,9 +25,9 @@ RSpec.describe '/notes', type: :request do
       get notebook_notes_url(notebook_1), headers: valid_headers, as: :json
 
       expect(response).to be_successful
-      expect(response.body).to include(note_1.contents)
-      expect(response.body).not_to include(note_2.contents)
-      expect(response.body).not_to include(valid_attributes[:contents])
+      expect(response.body).to include(note_1.content)
+      expect(response.body).not_to include(note_2.content)
+      expect(response.body).not_to include(valid_attributes[:content])
     end
   end
 
@@ -36,9 +36,9 @@ RSpec.describe '/notes', type: :request do
       get notebook_note_url(notebook_1, note_1), as: :json
 
       expect(response).to be_successful
-      expect(response.body).to include(note_1.contents)
-      expect(response.body).not_to include(note_2.contents)
-      expect(response.body).not_to include(valid_attributes[:contents])
+      expect(response.body).to include(note_1.content)
+      expect(response.body).not_to include(note_2.content)
+      expect(response.body).not_to include(valid_attributes[:content])
     end
   end
 
@@ -58,9 +58,9 @@ RSpec.describe '/notes', type: :request do
         expect(response).to have_http_status(:created)
         expect(response.content_type).to match(a_string_including('application/json'))
 
-        expect(response.body).not_to include(note_1.contents)
-        expect(response.body).not_to include(note_2.contents)
-        expect(response.body).to include(valid_attributes[:contents])
+        expect(response.body).not_to include(note_1.content)
+        expect(response.body).not_to include(note_2.content)
+        expect(response.body).to include(valid_attributes[:content])
       end
     end
 
@@ -79,15 +79,15 @@ RSpec.describe '/notes', type: :request do
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json; charset=utf-8')
 
-        expect(response.body).to include('Contents can\'t be blank')
-        expect(response.body).to include('Contents is too short (minimum is 5 characters)')
+        expect(response.body).to include('Content can\'t be blank')
+        expect(response.body).to include('Content is too short (minimum is 5 characters)')
       end
     end
   end
 
   describe 'PATCH /update' do
     context 'with valid parameters' do
-      let(:new_attributes) { FactoryBot.attributes_for(:note, notebook: notebook_1, contents: 'Updated Note') }
+      let(:new_attributes) { FactoryBot.attributes_for(:note, notebook: notebook_1, content: 'Updated Note') }
 
       it 'updates the requested note' do
         expect do
@@ -96,7 +96,7 @@ RSpec.describe '/notes', type: :request do
         end.to change(notebook_1.notes, :count).by(0)
 
         note_1.reload
-        expect(note_1.contents).to eql('Updated Note')
+        expect(note_1.content).to eql('Updated Note')
       end
 
       it 'renders a JSON response with the note' do
@@ -121,10 +121,10 @@ RSpec.describe '/notes', type: :request do
         expect(response.content_type).to eq('application/json; charset=utf-8')
 
         note_1.reload
-        expect(note_1.contents).to eql('Note 1')
+        expect(note_1.content).to eql('Note 1')
 
-        expect(response.body).to include('Contents can\'t be blank')
-        expect(response.body).to include('Contents is too short (minimum is 5 characters)')
+        expect(response.body).to include('Content can\'t be blank')
+        expect(response.body).to include('Content is too short (minimum is 5 characters)')
       end
     end
   end

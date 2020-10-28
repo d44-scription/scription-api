@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :note do
-    contents { 'Test note contents' }
+    content { 'Test note content' }
     notebook
   end
 end

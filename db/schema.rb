@@ -22,7 +22,7 @@ ActiveRecord::Schema.define(version: 2020_10_28_114420) do
   end
 
   create_table "notes", force: :cascade do |t|
-    t.text "contents"
+    t.text "content"
     t.bigint "notebook_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false

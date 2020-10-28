@@ -11,6 +11,6 @@ puts('Creating notebooks...')
 
   puts("Creating default notes for #{n.name}")
   3.times do |j|
-    n.notes.create(contents: "Test note #{i}:#{j}")
+    n.notes.create(content: "Test note #{i}:#{j}")
   end
 end
