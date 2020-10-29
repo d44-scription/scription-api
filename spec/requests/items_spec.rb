@@ -8,9 +8,7 @@ RSpec.describe '/notebooks/:id/items', type: :request do
 
   let!(:item_1) { FactoryBot.create(:notable, :item, notebook: notebook_1, name: 'Item 1') }
   let!(:item_2) { FactoryBot.create(:notable, :item, notebook: notebook_2, name: 'Item 2') }
-
-  let(:valid_attributes) { FactoryBot.attributes_for(:notable, :item, notebook: notebook_1) }
-  let(:invalid_attributes) { FactoryBot.attributes_for(:notable, :item, name: nil, description: 'Description') }
+  let!(:character) { FactoryBot.create(:notable, :character, notebook: notebook_1, name: 'Character') }
 
   # This should return the minimal set of values that should be in the headers
   # in order to pass any filters (e.g. authentication) defined in
@@ -27,7 +25,7 @@ RSpec.describe '/notebooks/:id/items', type: :request do
       expect(response).to be_successful
       expect(response.body).to include(item_1.name)
       expect(response.body).not_to include(item_2.name)
-      expect(response.body).not_to include(valid_attributes[:name])
+      expect(response.body).not_to include(character.name)
     end
   end
 end

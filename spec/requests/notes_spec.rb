@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe '/notes', type: :request do
+RSpec.describe '/notebooks/:id/notes', type: :request do
   let!(:notebook_1) { FactoryBot.create(:notebook) }
   let!(:notebook_2) { FactoryBot.create(:notebook) }
 

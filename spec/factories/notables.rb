@@ -9,5 +9,9 @@ FactoryBot.define do
     trait :item do
       type { 'Item' }
     end
+
+    trait :character do
+      type { 'Character' }
+    end
   end
 end
