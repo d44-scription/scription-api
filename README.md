@@ -51,7 +51,7 @@ As the output states, a number of these can be autocorrected by adding `-A` to t
 This app uses RSpec as it's testing framework. To run tests use:
 
 ```bash
-$ docker-compose run --rm web bundle exec rspec
+$ docker-compose run --rm -e RAILS_ENV=test web bundle exec rspec
   > Finished in X seconds (files took Y seconds to load)
   > X examples, Y failures, Z pending
 ```
@@ -63,15 +63,15 @@ This can also accept a path or can be filtered to run:
 3. a specific example in a given suite
 
 ```bash
-$ docker-compose run --rm web bundle exec rspec --only-failures
+$ docker-compose run --rm web -e RAILS_ENV=test bundle exec rspec --only-failures
   > Finished in X seconds (files took Y seconds to load)
   > X examples, Y failures, Z pending
 
-$ docker-compose run --rm web bundle exec rspec spec/requests
+$ docker-compose run --rm web -e RAILS_ENV=test bundle exec rspec spec/requests
   > Finished in X seconds (files took Y seconds to load)
   > X examples, Y failures, Z pending
 
-$ docker-compose run --rm web bundle exec rspec spec/requests/notebooks_spec.rb:19
+$ docker-compose run --rm web -e RAILS_ENV=test bundle exec rspec spec/requests/notebooks_spec.rb:19
   > Finished in X seconds (files took Y seconds to load)
   > X examples, Y failures, Z pending
 ```
