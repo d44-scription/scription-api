@@ -41,6 +41,6 @@ class NotablesController < ApplicationController
   end
 
   def notable_params
-    params.require(:notable).permit(:name, :description, :notebook_id)
+    params.require(:notable).permit(:name, :description, :type, :notebook_id)
   end
 end
