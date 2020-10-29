@@ -5,17 +5,22 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
-puts('Creating notebooks...')
 3.times do |i|
+  puts("Creating notebook #{i}")
   n = Notebook.create!(name: "Notebook #{i}")
 
-  puts("  Creating default notes for #{n.name}")
+  puts("  Creating notes for #{n.name}")
   3.times do |j|
     n.notes.create!(content: "Test note #{i}:#{j}")
   end
 
-  puts("  Creating default items for #{n.name}")
+  puts("  Creating items for #{n.name}")
   3.times do |j|
     n.items.create!(name: "Item #{i}:#{j}")
+  end
+
+  puts("  Creating characters for #{n.name}")
+  3.times do |j|
+    n.characters.create!(name: "Character #{i}:#{j}")
   end
 end

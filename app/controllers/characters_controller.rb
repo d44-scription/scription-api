@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-class ItemsController < ApplicationController
+class CharactersController < ApplicationController
   before_action :fetch_notebook
 
   def index
-    @items = @notebook.items
+    @characters = @notebook.characters
   end
 
   private
