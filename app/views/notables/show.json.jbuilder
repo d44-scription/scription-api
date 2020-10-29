@@ -1,3 +1,3 @@
 # frozen_string_literal: true
-
-json.partial! 'notables/notable', notable: @notable
+partial_reference = @notable.type.downcase
+json.partial! "#{partial_reference}s/#{partial_reference}", notable: @notable

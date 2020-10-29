@@ -3,5 +3,6 @@ Rails.application.routes.draw do
     resources :notes
     resources :notables
     resources :items, only: %i[index]
+    resources :characters, only: %i[index]
   end
 end
