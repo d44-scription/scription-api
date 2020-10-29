@@ -68,8 +68,8 @@ RSpec.describe '/notebooks/:id/notables', type: :request do
       it 'creates a new Character' do
         expect do
           post notebook_notables_url(notebook_1),
-               params: item_attributes, headers: valid_headers, as: :json
-        end.to change(notebook_1.items, :count).by(1)
+               params: character_attributes, headers: valid_headers, as: :json
+        end.to change(notebook_1.characters, :count).by(1)
       end
 
       it 'renders a JSON response with the new notable' do
