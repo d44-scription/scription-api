@@ -6,8 +6,8 @@ RSpec.describe '/notebooks/:id/characters', type: :request do
   let!(:notebook_1) { FactoryBot.create(:notebook) }
   let!(:notebook_2) { FactoryBot.create(:notebook) }
 
-  let!(:character_1) { FactoryBot.create(:notable, :character, notebook: notebook_1, name: 'character 1') }
-  let!(:character_2) { FactoryBot.create(:notable, :character, notebook: notebook_2, name: 'character 2') }
+  let!(:character_1) { FactoryBot.create(:notable, :character, notebook: notebook_1, name: 'Character 1') }
+  let!(:character_2) { FactoryBot.create(:notable, :character, notebook: notebook_2, name: 'Character 2') }
   let!(:item) { FactoryBot.create(:notable, :item, notebook: notebook_2, name: 'Item') }
 
   # This should return the minimal set of values that should be in the headers

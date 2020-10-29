@@ -26,6 +26,7 @@ RSpec.describe Notable, type: :model do
 
   context 'when an item' do
     let!(:item) { FactoryBot.build(:notable, :item, notebook: notebook) }
+
     it 'is valid when attributes are correct' do
       expect(notebook.items).to be_empty
 
@@ -59,6 +60,23 @@ RSpec.describe Notable, type: :model do
 
       expect(item.errors.full_messages).to include('Notebook can\'t be blank', 'Notebook must exist')
       expect(item).not_to be_valid
+    end
+  end
+
+  context 'when a  character' do
+    let!(:character) { FactoryBot.build(:notable, :character, notebook: notebook) }
+
+    it 'is valid when attributes are correct' do
+      expect(notebook.characters).to be_empty
+
+      expect(character).to have(0).errors_on(:type)
+      expect(character).to have(0).errors_on(:name)
+      expect(character).to have(0).errors_on(:notebook)
+
+      expect(character).to be_valid
+
+      character.save
+      expect(notebook.characters).not_to be_empty
     end
   end
 end
