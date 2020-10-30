@@ -7,9 +7,11 @@ RSpec.describe '/notebooks/:id/notables', type: :request do
 
   let!(:item) { FactoryBot.create(:notable, :item, notebook: notebook_1, name: 'Item') }
   let!(:character) { FactoryBot.create(:notable, :item, notebook: notebook_1, name: 'Character') }
+  let!(:location) { FactoryBot.create(:notable, :item, notebook: notebook_1, name: 'Location') }
 
   let(:item_attributes) { FactoryBot.attributes_for(:notable, :item, notebook: notebook_1) }
   let(:character_attributes) { FactoryBot.attributes_for(:notable, :character, notebook: notebook_1) }
+  let(:location_attributes) { FactoryBot.attributes_for(:notable, :location, notebook: notebook_1) }
 
   let!(:invalid_notebook) { FactoryBot.create(:notebook) }
   let!(:invalid_item) { FactoryBot.create(:notable, :item, notebook: invalid_notebook, name: 'Other Item') }
@@ -31,12 +33,14 @@ RSpec.describe '/notebooks/:id/notables', type: :request do
       expect(response).to be_successful
       expect(response.body).to include(item.name)
       expect(response.body).to include(character.name)
+      expect(response.body).to include(location.name)
 
       expect(response.body).to include('type')
 
       expect(response.body).not_to include(invalid_item.name)
       expect(response.body).not_to include(item_attributes[:name])
       expect(response.body).not_to include(character_attributes[:name])
+      expect(response.body).not_to include(location_attributes[:name])
     end
   end
 
@@ -47,12 +51,14 @@ RSpec.describe '/notebooks/:id/notables', type: :request do
       expect(response).to be_successful
       expect(response.body).to include(item.name)
       expect(response.body).not_to include(character.name)
+      expect(response.body).not_to include(location.name)
 
       expect(response.body).not_to include('type')
 
       expect(response.body).not_to include(invalid_item.name)
       expect(response.body).not_to include(item_attributes[:name])
       expect(response.body).not_to include(character_attributes[:name])
+      expect(response.body).not_to include(location_attributes[:name])
     end
   end
 
@@ -72,6 +78,13 @@ RSpec.describe '/notebooks/:id/notables', type: :request do
         end.to change(notebook_1.characters, :count).by(1)
       end
 
+      it 'creates a new Location' do
+        expect do
+          post notebook_notables_url(notebook_1),
+               params: location_attributes, headers: valid_headers, as: :json
+        end.to change(notebook_1.locations, :count).by(1)
+      end
+
       it 'renders a JSON response with the new notable' do
         post notebook_notables_url(notebook_1),
              params: item_attributes, headers: valid_headers, as: :json
@@ -81,7 +94,10 @@ RSpec.describe '/notebooks/:id/notables', type: :request do
 
         expect(response.body).not_to include(item.name)
         expect(response.body).not_to include(character.name)
+        expect(response.body).not_to include(location.name)
+
         expect(response.body).not_to include(invalid_item.name)
+
         expect(response.body).to include(item_attributes[:name])
         expect(response.body).to include(item_attributes[:description])
       end
@@ -102,7 +118,7 @@ RSpec.describe '/notebooks/:id/notables', type: :request do
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json; charset=utf-8')
 
-        expect(response.body).to include('Type must be one of Item/Character')
+        expect(response.body).to include('Type must be one of Item/Character/Location')
       end
     end
   end
@@ -145,7 +161,7 @@ RSpec.describe '/notebooks/:id/notables', type: :request do
         item.reload
         expect(item.name).to eql('Item')
 
-        expect(response.body).to include('Type must be one of Item/Character')
+        expect(response.body).to include('Type must be one of Item/Character/Location')
       end
     end
   end
@@ -154,7 +170,7 @@ RSpec.describe '/notebooks/:id/notables', type: :request do
     it 'destroys only the requested note' do
       expect do
         delete notebook_notable_url(notebook_1, item), headers: valid_headers, as: :json
-      end.to change(notebook_1.items, :count).by(-1)
+      end.to change(notebook_1.notables, :count).by(-1)
     end
   end
 end

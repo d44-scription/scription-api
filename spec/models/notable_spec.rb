@@ -11,7 +11,7 @@ RSpec.describe Notable, type: :model do
     it 'is not valid without a set type' do
       expect(notable).to have(2).errors_on(:type)
 
-      expect(notable.errors.full_messages).to include('Type must be one of Item/Character', 'Type can\'t be blank')
+      expect(notable.errors.full_messages).to include('Type must be one of Item/Character/Location', 'Type can\'t be blank')
       expect(notable).not_to be_valid
     end
 
@@ -19,7 +19,7 @@ RSpec.describe Notable, type: :model do
       notable.type = 'Invalid'
       expect(notable).to have(1).errors_on(:type)
 
-      expect(notable.errors.full_messages).to include('Type must be one of Item/Character')
+      expect(notable.errors.full_messages).to include('Type must be one of Item/Character/Location')
       expect(notable).not_to be_valid
     end
   end
@@ -63,7 +63,7 @@ RSpec.describe Notable, type: :model do
     end
   end
 
-  context 'when a  character' do
+  context 'when a character' do
     let!(:character) { FactoryBot.build(:notable, :character, notebook: notebook) }
 
     it 'is valid when attributes are correct' do
@@ -77,6 +77,23 @@ RSpec.describe Notable, type: :model do
 
       character.save
       expect(notebook.characters).not_to be_empty
+    end
+  end
+
+  context 'when a location' do
+    let!(:location) { FactoryBot.build(:notable, :location, notebook: notebook) }
+
+    it 'is valid when attributes are correct' do
+      expect(notebook.locations).to be_empty
+
+      expect(location).to have(0).errors_on(:type)
+      expect(location).to have(0).errors_on(:name)
+      expect(location).to have(0).errors_on(:notebook)
+
+      expect(location).to be_valid
+
+      location.save
+      expect(notebook.locations).not_to be_empty
     end
   end
 end
