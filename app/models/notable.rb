@@ -9,7 +9,7 @@ class Notable < ApplicationRecord
   validates :notebook, presence: true
   validates :name, presence: true
 
-  TYPES = %w[Item Character].freeze
+  TYPES = %w[Item Character Location].freeze
 
   private
 
