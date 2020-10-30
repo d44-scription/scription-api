@@ -2,14 +2,14 @@
 
 require 'rails_helper'
 
-RSpec.describe '/notebooks/:id/items', type: :request do
+RSpec.describe '/notebooks/:id/locations', type: :request do
   let!(:notebook_1) { FactoryBot.create(:notebook) }
   let!(:notebook_2) { FactoryBot.create(:notebook) }
 
-  let!(:item_1) { FactoryBot.create(:notable, :item, notebook: notebook_1, name: 'Item 1') }
-  let!(:item_2) { FactoryBot.create(:notable, :item, notebook: notebook_2, name: 'Item 2') }
+  let!(:location_1) { FactoryBot.create(:notable, :location, notebook: notebook_1, name: 'Location 1') }
+  let!(:location_2) { FactoryBot.create(:notable, :location, notebook: notebook_2, name: 'Location 2') }
+  let!(:item) { FactoryBot.create(:notable, :item, notebook: notebook_1, name: 'Item') }
   let!(:character) { FactoryBot.create(:notable, :character, notebook: notebook_1, name: 'Character') }
-  let!(:location) { FactoryBot.create(:notable, :location, notebook: notebook_1, name: 'Location') }
 
   # This should return the minimal set of values that should be in the headers
   # in order to pass any filters (e.g. authentication) defined in
@@ -21,14 +21,14 @@ RSpec.describe '/notebooks/:id/items', type: :request do
 
   describe 'GET /index' do
     it 'scopes response to currently viewed notebook' do
-      get notebook_items_url(notebook_1), headers: valid_headers, as: :json
+      get notebook_locations_url(notebook_1), headers: valid_headers, as: :json
 
       expect(response).to be_successful
-      expect(response.body).to include(item_1.name)
+      expect(response.body).to include(location_1.name)
 
-      expect(response.body).not_to include(item_2.name)
+      expect(response.body).not_to include(location_2.name)
+      expect(response.body).not_to include(item.name)
       expect(response.body).not_to include(character.name)
-      expect(response.body).not_to include(location.name)
     end
   end
 end

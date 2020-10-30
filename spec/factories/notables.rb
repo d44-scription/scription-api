@@ -13,5 +13,9 @@ FactoryBot.define do
     trait :character do
       type { 'Character' }
     end
+
+    trait :location do
+      type { 'Location' }
+    end
   end
 end

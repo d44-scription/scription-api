@@ -23,4 +23,9 @@
   3.times do |j|
     n.characters.create!(name: "Character #{i}:#{j}")
   end
+
+  puts("  Creating locations for #{n.name}")
+  3.times do |j|
+    n.locations.create!(name: "Location #{i}:#{j}")
+  end
 end
