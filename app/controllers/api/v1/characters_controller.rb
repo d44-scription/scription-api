@@ -1,17 +1,19 @@
 # frozen_string_literal: true
 
-module Api::V1
-  class CharactersController < ApplicationController
-    before_action :fetch_notebook
+module Api
+  module V1
+    class CharactersController < ApplicationController
+      before_action :fetch_notebook
 
-    def index
-      @characters = @notebook.characters
-    end
+      def index
+        @characters = @notebook.characters
+      end
 
-    private
+      private
 
-    def fetch_notebook
-      @notebook = Notebook.find(params[:notebook_id])
+      def fetch_notebook
+        @notebook = Notebook.find(params[:notebook_id])
+      end
     end
   end
 end
