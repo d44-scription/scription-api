@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe '/notebooks/:id/notables', type: :request do
+RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
   let!(:notebook_1) { FactoryBot.create(:notebook) }
 
   let!(:item) { FactoryBot.create(:notable, :item, notebook: notebook_1, name: 'Item') }
@@ -28,7 +28,7 @@ RSpec.describe '/notebooks/:id/notables', type: :request do
 
   describe 'GET /index' do
     it 'retrieves all notables for current notebook' do
-      get notebook_notables_url(notebook_1), headers: valid_headers, as: :json
+      get api_v1_notebook_notables_url(notebook_1), headers: valid_headers, as: :json
 
       expect(response).to be_successful
       expect(response.body).to include(item.name)
@@ -46,7 +46,7 @@ RSpec.describe '/notebooks/:id/notables', type: :request do
 
   describe 'GET /show' do
     it 'renders a successful response when note is linked to given notebook' do
-      get notebook_notable_url(notebook_1, item), as: :json
+      get api_v1_notebook_notable_url(notebook_1, item), as: :json
 
       expect(response).to be_successful
       expect(response.body).to include(item.name)
@@ -66,27 +66,27 @@ RSpec.describe '/notebooks/:id/notables', type: :request do
     context 'with valid parameters' do
       it 'creates a new Item' do
         expect do
-          post notebook_notables_url(notebook_1),
+          post api_v1_notebook_notables_url(notebook_1),
                params: item_attributes, headers: valid_headers, as: :json
         end.to change(notebook_1.items, :count).by(1)
       end
 
       it 'creates a new Character' do
         expect do
-          post notebook_notables_url(notebook_1),
+          post api_v1_notebook_notables_url(notebook_1),
                params: character_attributes, headers: valid_headers, as: :json
         end.to change(notebook_1.characters, :count).by(1)
       end
 
       it 'creates a new Location' do
         expect do
-          post notebook_notables_url(notebook_1),
+          post api_v1_notebook_notables_url(notebook_1),
                params: location_attributes, headers: valid_headers, as: :json
         end.to change(notebook_1.locations, :count).by(1)
       end
 
       it 'renders a JSON response with the new notable' do
-        post notebook_notables_url(notebook_1),
+        post api_v1_notebook_notables_url(notebook_1),
              params: item_attributes, headers: valid_headers, as: :json
 
         expect(response).to have_http_status(:created)
@@ -106,13 +106,13 @@ RSpec.describe '/notebooks/:id/notables', type: :request do
     context 'with invalid parameters' do
       it 'does not create a new notable' do
         expect do
-          post notebook_notables_url(notebook_1),
+          post api_v1_notebook_notables_url(notebook_1),
                params: invalid_attributes, as: :json
         end.to change(Item, :count).by(0)
       end
 
       it 'renders a JSON response with errors for the new notable' do
-        post notebook_notables_url(notebook_1),
+        post api_v1_notebook_notables_url(notebook_1),
              params: invalid_attributes, headers: valid_headers, as: :json
 
         expect(response).to have_http_status(:unprocessable_entity)
@@ -129,7 +129,7 @@ RSpec.describe '/notebooks/:id/notables', type: :request do
 
       it 'updates the requested item' do
         expect do
-          patch notebook_notable_url(notebook_1, item),
+          patch api_v1_notebook_notable_url(notebook_1, item),
                 params: new_attributes, headers: valid_headers, as: :json
         end.to change(notebook_1.items, :count).by(0)
 
@@ -139,7 +139,7 @@ RSpec.describe '/notebooks/:id/notables', type: :request do
 
       it 'renders a JSON response with the item' do
         expect do
-          patch notebook_notable_url(notebook_1, item),
+          patch api_v1_notebook_notable_url(notebook_1, item),
                 params: new_attributes, headers: valid_headers, as: :json
         end.to change(notebook_1.items, :count).by(0)
 
@@ -151,7 +151,7 @@ RSpec.describe '/notebooks/:id/notables', type: :request do
     context 'with invalid parameters' do
       it 'renders a JSON response with errors for the note' do
         expect do
-          patch notebook_notable_url(notebook_1, item),
+          patch api_v1_notebook_notable_url(notebook_1, item),
                 params: invalid_attributes, headers: valid_headers, as: :json
         end.to change(notebook_1.items, :count).by(0)
 
@@ -169,7 +169,7 @@ RSpec.describe '/notebooks/:id/notables', type: :request do
   describe 'DELETE /destroy' do
     it 'destroys only the requested note' do
       expect do
-        delete notebook_notable_url(notebook_1, item), headers: valid_headers, as: :json
+        delete api_v1_notebook_notable_url(notebook_1, item), headers: valid_headers, as: :json
       end.to change(notebook_1.notables, :count).by(-1)
     end
   end

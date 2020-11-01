@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe '/notebooks', type: :request do
+RSpec.describe '/api/v1/notebooks', type: :request do
   let!(:existing_notebook) { FactoryBot.create(:notebook) }
 
   let(:valid_attributes) { FactoryBot.attributes_for(:notebook) }
@@ -18,7 +18,7 @@ RSpec.describe '/notebooks', type: :request do
 
   describe 'GET /index' do
     it 'renders a successful response' do
-      get notebooks_url, headers: valid_headers, as: :json
+      get api_v1_notebooks_url, headers: valid_headers, as: :json
 
       expect(response).to be_successful
       expect(response.body).to include(existing_notebook.name)
@@ -30,7 +30,7 @@ RSpec.describe '/notebooks', type: :request do
     let!(:note) { FactoryBot.create(:note, notebook: existing_notebook) }
 
     it 'renders a successful response' do
-      get notebook_url(existing_notebook), as: :json
+      get api_v1_notebook_url(existing_notebook), as: :json
 
       expect(response).to be_successful
       expect(response.body).to include(existing_notebook.name)
@@ -42,13 +42,13 @@ RSpec.describe '/notebooks', type: :request do
     context 'with valid parameters' do
       it 'creates a new Notebook' do
         expect do
-          post notebooks_url,
+          post api_v1_notebooks_url,
                params: valid_attributes, headers: valid_headers, as: :json
         end.to change(Notebook, :count).by(1)
       end
 
       it 'renders a JSON response with the new notebook' do
-        post notebooks_url,
+        post api_v1_notebooks_url,
              params: valid_attributes, headers: valid_headers, as: :json
 
         expect(response).to have_http_status(:created)
@@ -59,13 +59,13 @@ RSpec.describe '/notebooks', type: :request do
     context 'with invalid parameters' do
       it 'does not create a new Notebook' do
         expect do
-          post notebooks_url,
+          post api_v1_notebooks_url,
                params: invalid_attributes, as: :json
         end.to change(Notebook, :count).by(0)
       end
 
       it 'renders a JSON response with errors for the new notebook' do
-        post notebooks_url,
+        post api_v1_notebooks_url,
              params: invalid_attributes, headers: valid_headers, as: :json
 
         expect(response).to have_http_status(:unprocessable_entity)
@@ -81,7 +81,7 @@ RSpec.describe '/notebooks', type: :request do
       let(:new_attributes) { FactoryBot.attributes_for(:notebook, name: 'Updated Notebook') }
 
       it 'updates the requested notebook' do
-        patch notebook_url(existing_notebook),
+        patch api_v1_notebook_url(existing_notebook),
               params: new_attributes, headers: valid_headers, as: :json
 
         existing_notebook.reload
@@ -89,7 +89,7 @@ RSpec.describe '/notebooks', type: :request do
       end
 
       it 'renders a JSON response with the notebook' do
-        patch notebook_url(existing_notebook),
+        patch api_v1_notebook_url(existing_notebook),
               params: new_attributes, headers: valid_headers, as: :json
 
         expect(response).to have_http_status(:ok)
@@ -99,7 +99,7 @@ RSpec.describe '/notebooks', type: :request do
 
     context 'with invalid parameters' do
       it 'renders a JSON response with errors for the notebook' do
-        patch notebook_url(existing_notebook),
+        patch api_v1_notebook_url(existing_notebook),
               params: invalid_attributes, headers: valid_headers, as: :json
 
         expect(response).to have_http_status(:unprocessable_entity)
@@ -115,7 +115,7 @@ RSpec.describe '/notebooks', type: :request do
   describe 'DELETE /destroy' do
     it 'destroys the requested notebook' do
       expect do
-        delete notebook_url(existing_notebook), headers: valid_headers, as: :json
+        delete api_v1_notebook_url(existing_notebook), headers: valid_headers, as: :json
       end.to change(Notebook, :count).by(-1)
     end
   end

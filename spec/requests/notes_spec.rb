@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe '/notebooks/:id/notes', type: :request do
+RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
   let!(:notebook_1) { FactoryBot.create(:notebook) }
   let!(:notebook_2) { FactoryBot.create(:notebook) }
 
@@ -22,7 +22,7 @@ RSpec.describe '/notebooks/:id/notes', type: :request do
 
   describe 'GET /index' do
     it 'scopes response to currently viewed notebook' do
-      get notebook_notes_url(notebook_1), headers: valid_headers, as: :json
+      get api_v1_notebook_notes_url(notebook_1), headers: valid_headers, as: :json
 
       expect(response).to be_successful
       expect(response.body).to include(note_1.content)
@@ -33,7 +33,7 @@ RSpec.describe '/notebooks/:id/notes', type: :request do
 
   describe 'GET /show' do
     it 'renders a successful response when note is linked to given notebook' do
-      get notebook_note_url(notebook_1, note_1), as: :json
+      get api_v1_notebook_note_url(notebook_1, note_1), as: :json
 
       expect(response).to be_successful
       expect(response.body).to include(note_1.content)
@@ -46,13 +46,13 @@ RSpec.describe '/notebooks/:id/notes', type: :request do
     context 'with valid parameters' do
       it 'creates a new Note' do
         expect do
-          post notebook_notes_url(notebook_1),
+          post api_v1_notebook_notes_url(notebook_1),
                params: valid_attributes, headers: valid_headers, as: :json
         end.to change(notebook_1.notes, :count).by(1)
       end
 
       it 'renders a JSON response with the new note' do
-        post notebook_notes_url(notebook_1),
+        post api_v1_notebook_notes_url(notebook_1),
              params: valid_attributes, headers: valid_headers, as: :json
 
         expect(response).to have_http_status(:created)
@@ -67,13 +67,13 @@ RSpec.describe '/notebooks/:id/notes', type: :request do
     context 'with invalid parameters' do
       it 'does not create a new Note' do
         expect do
-          post notebook_notes_url(notebook_1),
+          post api_v1_notebook_notes_url(notebook_1),
                params: invalid_attributes, as: :json
         end.to change(Note, :count).by(0)
       end
 
       it 'renders a JSON response with errors for the new note' do
-        post notebook_notes_url(notebook_1),
+        post api_v1_notebook_notes_url(notebook_1),
              params: invalid_attributes, headers: valid_headers, as: :json
 
         expect(response).to have_http_status(:unprocessable_entity)
@@ -91,7 +91,7 @@ RSpec.describe '/notebooks/:id/notes', type: :request do
 
       it 'updates the requested note' do
         expect do
-          patch notebook_note_url(notebook_1, note_1),
+          patch api_v1_notebook_note_url(notebook_1, note_1),
                 params: new_attributes, headers: valid_headers, as: :json
         end.to change(notebook_1.notes, :count).by(0)
 
@@ -101,7 +101,7 @@ RSpec.describe '/notebooks/:id/notes', type: :request do
 
       it 'renders a JSON response with the note' do
         expect do
-          patch notebook_note_url(notebook_1, note_1),
+          patch api_v1_notebook_note_url(notebook_1, note_1),
                 params: new_attributes, headers: valid_headers, as: :json
         end.to change(notebook_1.notes, :count).by(0)
 
@@ -113,7 +113,7 @@ RSpec.describe '/notebooks/:id/notes', type: :request do
     context 'with invalid parameters' do
       it 'renders a JSON response with errors for the note' do
         expect do
-          patch notebook_note_url(notebook_1, note_1),
+          patch api_v1_notebook_note_url(notebook_1, note_1),
                 params: invalid_attributes, headers: valid_headers, as: :json
         end.to change(notebook_1.notes, :count).by(0)
 
@@ -132,7 +132,7 @@ RSpec.describe '/notebooks/:id/notes', type: :request do
   describe 'DELETE /destroy' do
     it 'destroys only the requested note' do
       expect do
-        delete notebook_note_url(notebook_1, note_1), headers: valid_headers, as: :json
+        delete api_v1_notebook_note_url(notebook_1, note_1), headers: valid_headers, as: :json
       end.to change(Note, :count).by(-1)
     end
   end
