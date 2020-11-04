@@ -3,17 +3,63 @@
 require 'rails_helper'
 
 RSpec.describe Notebook, type: :model do
-  let!(:notebook) { FactoryBot.build(:notebook) }
+  describe 'validations' do
+    let!(:notebook) { FactoryBot.build(:notebook) }
 
-  it 'is valid when attributes are correct' do
-    expect(notebook).to have(0).errors_on(:name)
-    expect(notebook).to be_valid
+    it 'is valid when attributes are correct' do
+      expect(notebook).to have(0).errors_on(:name)
+      expect(notebook).to be_valid
+    end
+
+    it 'is not valid when no name provided' do
+      notebook.name = nil
+
+      expect(notebook).to have(1).errors_on(:name)
+      expect(notebook).not_to be_valid
+    end
   end
 
-  it 'is not valid when no name provided' do
-    notebook.name = nil
+  describe 'relationships' do
+    let!(:notebook) { FactoryBot.create(:notebook) }
 
-    expect(notebook).to have(1).errors_on(:name)
-    expect(notebook).not_to be_valid
+    it 'successfully creates and destroys an associated note' do
+      expect do
+        notebook.notes.create(content: 'Test Note')
+      end.to change(notebook.notes, :count).by(1)
+
+      expect do
+        notebook.destroy
+      end.to change(Notebook, :count).by(-1)
+    end
+
+    it 'successfully creates and destroys an associated item' do
+      expect do
+        notebook.items.create(name: 'Test Item')
+      end.to change(notebook.items, :count).by(1)
+
+      expect do
+        notebook.destroy
+      end.to change(Notebook, :count).by(-1)
+    end
+
+    it 'successfully creates and destroys an associated character' do
+      expect do
+        notebook.characters.create(name: 'Test Character')
+      end.to change(notebook.characters, :count).by(1)
+
+      expect do
+        notebook.destroy
+      end.to change(Notebook, :count).by(-1)
+    end
+
+    it 'successfully creates and destroys an associated location' do
+      expect do
+        notebook.locations.create(name: 'Test Location')
+      end.to change(notebook.locations, :count).by(1)
+
+      expect do
+        notebook.destroy
+      end.to change(Notebook, :count).by(-1)
+    end
   end
 end
