@@ -10,4 +10,5 @@ class Notebook < ApplicationRecord
   end
 
   validates :name, presence: true, length: { maximum: 30 }
+  validates :summary, length: { maximum: 250 }
 end

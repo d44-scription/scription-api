@@ -8,6 +8,15 @@ RSpec.describe Notebook, type: :model do
 
     it 'is valid when attributes are correct' do
       expect(notebook).to have(0).errors_on(:name)
+      expect(notebook).to have(0).errors_on(:summary)
+      expect(notebook).to be_valid
+    end
+
+    it 'is valid without a summary' do
+      notebook.summary = nil
+
+      expect(notebook).to have(0).errors_on(:name)
+      expect(notebook).to have(0).errors_on(:summary)
       expect(notebook).to be_valid
     end
 
@@ -15,6 +24,7 @@ RSpec.describe Notebook, type: :model do
       notebook.name = nil
 
       expect(notebook).to have(1).errors_on(:name)
+      expect(notebook).to have(0).errors_on(:summary)
       expect(notebook).not_to be_valid
     end
 
@@ -22,6 +32,15 @@ RSpec.describe Notebook, type: :model do
       notebook.name = '0' * 31
 
       expect(notebook).to have(1).errors_on(:name)
+      expect(notebook).to have(0).errors_on(:summary)
+      expect(notebook).not_to be_valid
+    end
+
+    it 'is not valid when summary is greater than 250 chars' do
+      notebook.summary = '0' * 251
+
+      expect(notebook).to have(0).errors_on(:name)
+      expect(notebook).to have(1).errors_on(:summary)
       expect(notebook).not_to be_valid
     end
   end
