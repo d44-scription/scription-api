@@ -6,7 +6,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
   let!(:existing_notebook) { FactoryBot.create(:notebook) }
 
   let(:valid_attributes) { FactoryBot.attributes_for(:notebook) }
-  let(:invalid_attributes) { FactoryBot.attributes_for(:notebook, name: nil) }
+  let(:invalid_attributes) { FactoryBot.attributes_for(:notebook, name: '0' * 31) }
 
   # This should return the minimal set of values that should be in the headers
   # in order to pass any filters (e.g. authentication) defined in
@@ -71,7 +71,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json; charset=utf-8')
 
-        expect(response.body).to include('Name can\'t be blank')
+        expect(response.body).to include('Name is too long (maximum is 30 characters)')
       end
     end
   end
@@ -107,7 +107,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
 
         existing_notebook.reload
         expect(existing_notebook.name).not_to eql('Updated Notebook')
-        expect(response.body).to include('Name can\'t be blank')
+        expect(response.body).to include('Name is too long (maximum is 30 characters)')
       end
     end
   end
