@@ -78,7 +78,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
 
   describe 'PATCH /update' do
     context 'with valid parameters' do
-      let(:new_attributes) { FactoryBot.attributes_for(:notebook, name: 'Updated Notebook') }
+      let(:new_attributes) { FactoryBot.attributes_for(:notebook, name: 'Updated Notebook', summary: 'Updated Summary') }
 
       it 'updates the requested notebook' do
         patch api_v1_notebook_url(existing_notebook),
@@ -86,6 +86,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
 
         existing_notebook.reload
         expect(existing_notebook.name).to eql('Updated Notebook')
+        expect(existing_notebook.summary).to eql('Updated Summary')
       end
 
       it 'renders a JSON response with the notebook' do
