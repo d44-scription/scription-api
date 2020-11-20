@@ -9,5 +9,5 @@ class Notebook < ApplicationRecord
     model.has_many :locations
   end
 
-  validates :name, presence: true
+  validates :name, presence: true, length: { maximum: 30 }
 end

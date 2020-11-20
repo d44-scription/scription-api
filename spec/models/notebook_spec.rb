@@ -17,6 +17,13 @@ RSpec.describe Notebook, type: :model do
       expect(notebook).to have(1).errors_on(:name)
       expect(notebook).not_to be_valid
     end
+
+    it 'is not valid when name is greater than 30 chars' do
+      notebook.name = '0' * 31
+
+      expect(notebook).to have(1).errors_on(:name)
+      expect(notebook).not_to be_valid
+    end
   end
 
   describe 'relationships' do
