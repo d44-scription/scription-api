@@ -38,7 +38,7 @@ module Api
       end
 
       def notebook_params
-        params.require(:notebook).permit(:name)
+        params.require(:notebook).permit(:name, :summary)
       end
     end
   end
