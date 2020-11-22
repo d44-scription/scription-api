@@ -22,6 +22,8 @@ RSpec.describe '/api/v1/notebooks', type: :request do
 
       expect(response).to be_successful
       expect(response.body).to include(existing_notebook.name)
+      expect(response.body).to include(existing_notebook.summary)
+      expect(response.body).to include(existing_notebook.order_index.to_s)
       expect(response.body).not_to include(valid_attributes[:name])
     end
   end
