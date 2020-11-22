@@ -6,7 +6,7 @@ module Api
       before_action :fetch_notebook, only: %i[show update destroy]
 
       def index
-        @notebooks = Notebook.all
+        @notebooks = Notebook.all.order(:order_index)
       end
 
       def create
