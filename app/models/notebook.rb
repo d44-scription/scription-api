@@ -9,7 +9,7 @@ class Notebook < ApplicationRecord
     model.has_many :locations
   end
 
-  validates :name, presence: true, length: { maximum: 30 }
+  validates :name, presence: true, length: { maximum: 45 }
   validates :summary, length: { maximum: 250 }
   # TODO: Once users are added, ensure this is unique within the scope of each user
   validates :order_index, presence: true, uniqueness: true
