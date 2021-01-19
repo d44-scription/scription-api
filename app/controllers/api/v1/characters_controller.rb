@@ -7,6 +7,8 @@ module Api
 
       def index
         @characters = @notebook.characters
+
+        @characters = @characters.where('UPPER("name") LIKE ?', "%#{params[:q].upcase}%") if params[:q]
       end
 
       private

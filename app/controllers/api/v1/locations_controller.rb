@@ -7,6 +7,8 @@ module Api
 
       def index
         @locations = @notebook.locations
+
+        @locations = @locations.where('UPPER("name") LIKE ?', "%#{params[:q].upcase}%") if params[:q]
       end
 
       private
