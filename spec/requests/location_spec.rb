@@ -30,5 +30,62 @@ RSpec.describe '/api/v1/notebooks/:id/locations', type: :request do
       expect(response.body).not_to include(item.name)
       expect(response.body).not_to include(character.name)
     end
+
+    describe 'when searching' do
+      let!(:location_3) { FactoryBot.create(:notable, :location, notebook: notebook_1, name: "Different Location") }
+      let!(:location_4) { FactoryBot.create(:notable, :location, notebook: notebook_1, name: "Another Location") }
+
+      it 'returns a subset of locations matching the search query' do
+        get api_v1_notebook_locations_url(notebook_1, q: "Different"), headers: valid_headers, as: :json
+
+        expect(response).to be_successful
+        expect(response.body).not_to include(location_1.name)
+        expect(response.body).to include(location_3.name)
+        expect(response.body).not_to include(location_4.name)
+
+        expect(response.body).not_to include(location_2.name)
+        expect(response.body).not_to include(item.name)
+        expect(response.body).not_to include(character.name)
+      end
+
+      it 'returns an empty array when no locations match the query' do
+        get api_v1_notebook_locations_url(notebook_1, q: "TEST"), headers: valid_headers, as: :json
+
+        expect(response).to be_successful
+        expect(response.body).not_to include(location_1.name)
+        expect(response.body).not_to include(location_3.name)
+        expect(response.body).not_to include(location_4.name)
+
+        expect(response.body).not_to include(location_2.name)
+        expect(response.body).not_to include(item.name)
+        expect(response.body).not_to include(character.name)
+      end
+
+      it 'returns all locations when all match the query' do
+        get api_v1_notebook_locations_url(notebook_1, q: "Location"), headers: valid_headers, as: :json
+
+        expect(response).to be_successful
+        expect(response.body).to include(location_1.name)
+        expect(response.body).to include(location_3.name)
+        expect(response.body).to include(location_4.name)
+
+        expect(response.body).not_to include(location_2.name)
+        expect(response.body).not_to include(item.name)
+        expect(response.body).not_to include(character.name)
+      end
+
+      it 'ignores case when searching' do
+        get api_v1_notebook_locations_url(notebook_1, q: "aNoThEr"), headers: valid_headers, as: :json
+
+        expect(response).to be_successful
+        expect(response.body).not_to include(location_1.name)
+        expect(response.body).not_to include(location_3.name)
+        expect(response.body).to include(location_4.name)
+
+        expect(response.body).not_to include(location_2.name)
+        expect(response.body).not_to include(item.name)
+        expect(response.body).not_to include(character.name)
+      end
+    end
   end
 end
