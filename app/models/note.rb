@@ -4,9 +4,7 @@ class Note < ApplicationRecord
   belongs_to :notebook
   has_and_belongs_to_many :notables
 
-  before_validation :link_notables
-
-  validate :permitted_notables
+  validate :link_notables
   validates :notebook, presence: true
   validates :content, presence: true, length: { in: 5..500 }
 
@@ -20,13 +18,9 @@ class Note < ApplicationRecord
     code.gsub(/#{trigger}\[[^#{trigger}]*\]\(#{trigger}/, '').delete(')')
   end
 
-  def permitted_notables
-    errors.add(:notables, "must be from this notebook") if notables.any? do |n|
-      n.notebook != notebook
-    end
-  end
-
   def link_notables
+    notables.destroy_all
+
     if content
       link_characters if content.match(regex_for(Character::TRIGGER))
       link_items if content.match(regex_for(Item::TRIGGER))
@@ -46,8 +40,8 @@ class Note < ApplicationRecord
       character = notebook.characters.find_by(id: id)
 
       if character
-        # Link the character to the notebook without saving
-        association(:notables).add_to_target(character)
+        # Link the character to the notebook
+        notables << character
       else
         errors.add(:characters, "must be from this notebook")
       end
@@ -66,8 +60,8 @@ class Note < ApplicationRecord
       item = notebook.items.find_by(id: id)
 
       if item
-        # Link the item to the notebook without saving
-        association(:notables).add_to_target(item)
+        # Link the item to the notebook
+        notables << item
       else
         errors.add(:items, "must be from this notebook")
       end
@@ -86,8 +80,8 @@ class Note < ApplicationRecord
       location = notebook.locations.find_by(id: id)
 
       if location
-        # Link the location to the notebook without saving
-        association(:notables).add_to_target(location)
+        # Link the location to the notebook
+        notables << location
       else
         errors.add(:locations, "must be from this notebook")
       end

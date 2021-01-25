@@ -82,35 +82,38 @@ RSpec.describe Note, type: :model do
     end
 
     it 'is not valid when characters belong to a different notebook' do
+      note.content = "@[#{character_2.name}](@#{character_2.id})"
       note.notables << character_2
 
       expect(note).to have(0).errors_on(:content)
       expect(note).to have(0).errors_on(:notebook)
-      expect(note).to have(1).errors_on(:notables)
+      expect(note).to have(1).errors_on(:characters)
 
-      expect(note.errors.full_messages).to include('Notables must be from this notebook')
+      expect(note.errors.full_messages).to include('Characters must be from this notebook')
       expect(note).not_to be_valid
     end
 
     it 'is not valid when items belong to a different notebook' do
+      note.content = ":[#{item_2.name}](:#{item_2.id})"
       note.notables << item_2
 
       expect(note).to have(0).errors_on(:content)
       expect(note).to have(0).errors_on(:notebook)
-      expect(note).to have(1).errors_on(:notables)
+      expect(note).to have(1).errors_on(:items)
 
-      expect(note.errors.full_messages).to include('Notables must be from this notebook')
+      expect(note.errors.full_messages).to include('Items must be from this notebook')
       expect(note).not_to be_valid
     end
 
     it 'is not valid when locations belong to a different notebook' do
+      note.content = "#[#{location_2.name}](##{location_2.id})"
       note.notables << location_2
 
       expect(note).to have(0).errors_on(:content)
       expect(note).to have(0).errors_on(:notebook)
-      expect(note).to have(1).errors_on(:notables)
+      expect(note).to have(1).errors_on(:locations)
 
-      expect(note.errors.full_messages).to include('Notables must be from this notebook')
+      expect(note.errors.full_messages).to include('Locations must be from this notebook')
       expect(note).not_to be_valid
     end
   end
@@ -158,9 +161,8 @@ RSpec.describe Note, type: :model do
       end
 
       it 'returns an error when linking a character from a different notebook' do
-        note.content = "This is a note for #{character_3_content}"
+        note.update(content: "This is a note for #{character_3_content}")
 
-        expect(note).not_to be_valid
         expect(note.notables.count).to eql 0
         expect(note.errors.full_messages).to include('Characters must be from this notebook')
 
@@ -223,9 +225,8 @@ RSpec.describe Note, type: :model do
       end
 
       it 'returns an error when linking a item from a different notebook' do
-        note.content = "This is a note for #{item_3_content}"
+        note.update(content: "This is a note for #{item_3_content}")
 
-        expect(note).not_to be_valid
         expect(note.notables.count).to eql 0
         expect(note.errors.full_messages).to include('Items must be from this notebook')
 
@@ -288,9 +289,8 @@ RSpec.describe Note, type: :model do
       end
 
       it 'returns an error when linking a location from a different notebook' do
-        note.content = "This is a note for #{location_3_content}"
+        note.update(content: "This is a note for #{location_3_content}")
 
-        expect(note).not_to be_valid
         expect(note.notables.count).to eql 0
         expect(note.errors.full_messages).to include('Locations must be from this notebook')
 
@@ -364,10 +364,8 @@ RSpec.describe Note, type: :model do
       let!(:location_content) { "#[#{location.name}](##{location.id})"}
 
       it 'is successfully removes links to unused notables' do
-        note.content = "This is a note for #{character_content}"
-        note.save
+        note.update(content: "This is a note for #{character_content}")
 
-        expect(note).to be_valid
         expect(note.notables.count).to eql 1
 
         expect(note.notables.pluck(:id)).to include(character.id)
@@ -378,8 +376,8 @@ RSpec.describe Note, type: :model do
         expect(character.notes.length).to eql 1
         expect(character.notes).to include(note)
 
-        note.content = "#{item_content} can be found at #{location_content}"
-        note.save
+        note.update(content: "#{item_content} can be found at #{location_content}")
+        note.reload
 
         expect(note).to be_valid
         expect(note.notables.count).to eql 2
