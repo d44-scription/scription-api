@@ -353,5 +353,58 @@ RSpec.describe Note, type: :model do
         expect(location.notes).to include(note)
       end
     end
+
+    describe 'when changing contents to remove links' do
+      let!(:character) { FactoryBot.create(:notable, :character, notebook: notebook) }
+      let!(:item) { FactoryBot.create(:notable, :item, notebook: notebook) }
+      let!(:location) { FactoryBot.create(:notable, :location, notebook: notebook) }
+
+      let!(:character_content) { "@[#{character.name}](@#{character.id})"}
+      let!(:item_content) { ":[#{item.name}](:#{item.id})"}
+      let!(:location_content) { "#[#{location.name}](##{location.id})"}
+
+      it 'is successfully removes links to unused notables' do
+        note.content = "This is a note for #{character_content}"
+        note.save
+
+        expect(note).to be_valid
+        expect(note.notables.count).to eql 1
+
+        expect(note.notables.pluck(:id)).to include(character.id)
+        expect(note.notables.pluck(:name)).to include(character.name)
+
+        character.reload
+
+        expect(character.notes.length).to eql 1
+        expect(character.notes).to include(note)
+
+        note.content = "#{item_content} can be found at #{location_content}"
+        note.save
+
+        expect(note).to be_valid
+        expect(note.notables.count).to eql 2
+
+        expect(note.notables.pluck(:id)).not_to include(character.id)
+        expect(note.notables.pluck(:name)).not_to include(character.name)
+
+        expect(note.notables.pluck(:id)).to include(item.id)
+        expect(note.notables.pluck(:name)).to include(item.name)
+
+        expect(note.notables.pluck(:id)).to include(location.id)
+        expect(note.notables.pluck(:name)).to include(location.name)
+
+        character.reload
+        item.reload
+        location.reload
+
+        expect(character.notes.length).to eql 0
+
+        expect(item.notes.length).to eql 1
+        expect(item.notes).to include(note)
+
+        expect(location.notes.length).to eql 1
+        expect(location.notes).to include(note)
+      end
+    end
   end
 end

@@ -4,14 +4,13 @@ class Note < ApplicationRecord
   belongs_to :notebook
   has_and_belongs_to_many :notables
 
-  before_validation :clear_notables
-  before_validation :link_characters
-  before_validation :link_items
-  before_validation :link_locations
+  before_validation :link_notables
 
   validate :permitted_notables
   validates :notebook, presence: true
   validates :content, presence: true, length: { in: 5..500 }
+
+  private
 
   def regex_for(trigger)
     /#{trigger}\[[^#{trigger}]*\]\(#{trigger}\d\)/
@@ -21,21 +20,23 @@ class Note < ApplicationRecord
     code.gsub(/#{trigger}\[[^#{trigger}]*\]\(#{trigger}/, '').delete(')')
   end
 
-  private
-
   def permitted_notables
     errors.add(:notables, "must be from this notebook") if notables.any? do |n|
       n.notebook != notebook
     end
   end
 
-  def clear_notables
-    notables = []
+  def link_notables
+    if content
+      link_characters if content.match(regex_for(Character::TRIGGER))
+      link_items if content.match(regex_for(Item::TRIGGER))
+      link_locations if content.match(regex_for(Location::TRIGGER))
+    end
   end
 
   def link_characters
     # Find all matching instances of the regex
-    character_codes = content ? content.scan(regex_for(Character::TRIGGER)) : []
+    character_codes = content.scan(regex_for(Character::TRIGGER))
 
     character_codes.each do |c|
       # Remove the text surrounding the id
@@ -55,7 +56,7 @@ class Note < ApplicationRecord
 
   def link_items
     # Find all matching instances of the regex
-    item_codes = content ? content.scan(regex_for(Item::TRIGGER)) : []
+    item_codes = content.scan(regex_for(Item::TRIGGER))
 
     item_codes.each do |c|
       # Remove the text surrounding the id
@@ -75,7 +76,7 @@ class Note < ApplicationRecord
 
   def link_locations
     # Find all matching instances of the regex
-    location_codes = content ? content.scan(regex_for(Location::TRIGGER)) : []
+    location_codes = content.scan(regex_for(Location::TRIGGER))
 
     location_codes.each do |c|
       # Remove the text surrounding the id
