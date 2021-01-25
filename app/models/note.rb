@@ -8,6 +8,10 @@ class Note < ApplicationRecord
   validates :notebook, presence: true
   validates :content, presence: true, length: { in: 5..500 }
 
+  def notable_message
+    notables.any? ? "Note linked to: #{notables.pluck(:name).join("/")}" : 'Note linked to no notables'
+  end
+
   private
 
   def regex_for(trigger)

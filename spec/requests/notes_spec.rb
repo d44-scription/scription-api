@@ -37,6 +37,7 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
 
       expect(response).to be_successful
       expect(response.body).to include(note_1.content)
+      expect(response.body).to include('Note linked to no notables')
       expect(response.body).not_to include(note_2.content)
       expect(response.body).not_to include(valid_attributes[:content])
     end
@@ -61,6 +62,7 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
         expect(response.body).not_to include(note_1.content)
         expect(response.body).not_to include(note_2.content)
         expect(response.body).to include(valid_attributes[:content])
+        expect(response.body).to include('Note linked to no notables')
       end
     end
 
@@ -85,6 +87,7 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
         expect(response.body).not_to include(note_1.content)
         expect(response.body).not_to include(note_2.content)
         expect(response.body).to include(notable_attributes[:content])
+        expect(response.body).to include("Note linked to: #{notable.name}")
 
         note = notebook_1.notes.find_by(content: notable_attributes[:content])
         expect(notable.notes).to contain_exactly(note)
@@ -134,6 +137,39 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
 
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to eq('application/json; charset=utf-8')
+        expect(response.body).to include(new_attributes[:content])
+        expect(response.body).to include('Note linked to no notables')
+      end
+    end
+
+    context 'with a link to a notable' do
+      let(:notable) { FactoryBot.create(:notable, :character, notebook: notebook_1) }
+      let(:new_attributes) { FactoryBot.attributes_for(:note, notebook: notebook_1, content: "@[#{notable.name}](@#{notable.id})") }
+
+      it 'updates the requested note' do
+        expect do
+          patch api_v1_notebook_note_url(notebook_1, note_1),
+                params: new_attributes, headers: valid_headers, as: :json
+        end.to change(notebook_1.notes, :count).by(0)
+
+        note_1.reload
+        expect(note_1.content).to eql("@[#{notable.name}](@#{notable.id})")
+        expect(notable.notes).to contain_exactly(note_1)
+      end
+
+      it 'renders a JSON response with the new note' do
+        patch api_v1_notebook_note_url(notebook_1, note_1),
+              params: new_attributes, headers: valid_headers, as: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(response.content_type).to match(a_string_including('application/json'))
+
+        expect(response.body).not_to include(note_1.content)
+        expect(response.body).not_to include(note_2.content)
+        expect(response.body).to include(new_attributes[:content])
+        expect(response.body).to include("Note linked to: #{notable.name}")
+
+        expect(notable.notes).to contain_exactly(note_1)
       end
     end
 
