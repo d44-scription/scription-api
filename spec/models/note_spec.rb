@@ -9,6 +9,7 @@ RSpec.describe Note, type: :model do
   it 'is valid when attributes are correct' do
     expect(note).to have(0).errors_on(:content)
     expect(note).to have(0).errors_on(:notebook)
+    expect(note).to have(0).errors_on(:notables)
 
     expect(note).to be_valid
   end
@@ -18,6 +19,7 @@ RSpec.describe Note, type: :model do
 
     expect(note).to have(2).errors_on(:content)
     expect(note).to have(0).errors_on(:notebook)
+    expect(note).to have(0).errors_on(:notables)
 
     expect(note.errors.full_messages).to include('Content can\'t be blank', 'Content is too short (minimum is 5 characters)')
     expect(note).not_to be_valid
@@ -38,6 +40,7 @@ RSpec.describe Note, type: :model do
 
     expect(note).to have(1).errors_on(:content)
     expect(note).to have(0).errors_on(:notebook)
+    expect(note).to have(0).errors_on(:notables)
 
     expect(note.errors.full_messages).to include('Content is too short (minimum is 5 characters)')
     expect(note).not_to be_valid
@@ -48,12 +51,71 @@ RSpec.describe Note, type: :model do
 
     expect(note).to have(1).errors_on(:content)
     expect(note).to have(0).errors_on(:notebook)
+    expect(note).to have(0).errors_on(:notables)
 
     expect(note.errors.full_messages).to include('Content is too long (maximum is 500 characters)')
     expect(note).not_to be_valid
   end
 
-  describe 'linking to notables' do
+  describe 'with notables' do
+    let!(:notebook_2) { FactoryBot.create(:notebook) }
+
+    let!(:character_1) { FactoryBot.create(:notable, :character, notebook: notebook) }
+    let!(:character_2) { FactoryBot.create(:notable, :character, notebook: notebook_2) }
+
+    let!(:item_1) { FactoryBot.create(:notable, :item, notebook: notebook) }
+    let!(:item_2) { FactoryBot.create(:notable, :item, notebook: notebook_2) }
+
+    let!(:location_1) { FactoryBot.create(:notable, :location, notebook: notebook) }
+    let!(:location_2) { FactoryBot.create(:notable, :location, notebook: notebook_2) }
+
+    it 'is valid when notables are from same notebook' do
+      note.notables << character_1
+      note.notables << item_1
+      note.notables << location_1
+
+      expect(note).to have(0).errors_on(:content)
+      expect(note).to have(0).errors_on(:notebook)
+      expect(note).to have(0).errors_on(:notables)
+
+      expect(note).to be_valid
+    end
+
+    it 'is not valid when characters belong to a different notebook' do
+      note.notables << character_2
+
+      expect(note).to have(0).errors_on(:content)
+      expect(note).to have(0).errors_on(:notebook)
+      expect(note).to have(1).errors_on(:notables)
+
+      expect(note.errors.full_messages).to include('Notables must be from this notebook')
+      expect(note).not_to be_valid
+    end
+
+    it 'is not valid when items belong to a different notebook' do
+      note.notables << item_2
+
+      expect(note).to have(0).errors_on(:content)
+      expect(note).to have(0).errors_on(:notebook)
+      expect(note).to have(1).errors_on(:notables)
+
+      expect(note.errors.full_messages).to include('Notables must be from this notebook')
+      expect(note).not_to be_valid
+    end
+
+    it 'is not valid when locations belong to a different notebook' do
+      note.notables << location_2
+
+      expect(note).to have(0).errors_on(:content)
+      expect(note).to have(0).errors_on(:notebook)
+      expect(note).to have(1).errors_on(:notables)
+
+      expect(note.errors.full_messages).to include('Notables must be from this notebook')
+      expect(note).not_to be_valid
+    end
+  end
+
+  describe 'linking to characters' do
     let!(:notebook_2) { FactoryBot.create(:notebook) }
 
     let!(:character_1) { FactoryBot.create(:notable, :character, notebook: notebook) }
@@ -70,8 +132,6 @@ RSpec.describe Note, type: :model do
       note.save
 
       expect(note).to be_valid
-
-      raise character_1.notes.inspect
       expect(note.notables.count).to eql 2
 
       expect(note.notables.pluck(:id)).to include(character_1.id)
@@ -89,7 +149,7 @@ RSpec.describe Note, type: :model do
 
       expect(note).not_to be_valid
       expect(note.notables.count).to eql 0
-      expect(note.errors.full_messages).to include("Characters must be from this notebook")
+      expect(note.errors.full_messages).to include('Characters must be from this notebook')
 
       expect(note.notables.pluck(:id)).not_to include(character_1.id)
       expect(note.notables.pluck(:name)).not_to include(character_1.name)

@@ -29,7 +29,7 @@ class Note < ApplicationRecord
 
   def link_characters
     # Find all matching instances of the regex
-    character_codes = content.scan(CHARACTER_REGEX)
+    character_codes = content ? content.scan(CHARACTER_REGEX) : []
 
     character_codes.each do |c|
       # Remove the text surrounding the id
@@ -39,8 +39,8 @@ class Note < ApplicationRecord
       character = notebook.characters.find_by(id: id)
 
       if character
-        # Link the character to the notebook
-        notables << character
+        # Link the character to the notebook without saving
+        association(:notables).add_to_target(character)
       else
         errors.add(:characters, "must be from this notebook")
       end
