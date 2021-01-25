@@ -21,7 +21,7 @@ RSpec.describe Note, type: :model do
     expect(note).to have(0).errors_on(:notebook)
     expect(note).to have(0).errors_on(:notables)
 
-    expect(note.errors.full_messages).to include('Content can\'t be blank', 'Content is too short (minimum is 5 characters)')
+    expect(note.errors.full_messages).to contain_exactly('Content can\'t be blank', 'Content is too short (minimum is 5 characters)')
     expect(note).not_to be_valid
   end
 
@@ -31,7 +31,7 @@ RSpec.describe Note, type: :model do
     expect(note).to have(0).errors_on(:content)
     expect(note).to have(2).errors_on(:notebook)
 
-    expect(note.errors.full_messages).to include('Notebook must exist', 'Notebook can\'t be blank')
+    expect(note.errors.full_messages).to contain_exactly('Notebook must exist', 'Notebook can\'t be blank')
     expect(note).not_to be_valid
   end
 
@@ -42,7 +42,7 @@ RSpec.describe Note, type: :model do
     expect(note).to have(0).errors_on(:notebook)
     expect(note).to have(0).errors_on(:notables)
 
-    expect(note.errors.full_messages).to include('Content is too short (minimum is 5 characters)')
+    expect(note.errors.full_messages).to contain_exactly('Content is too short (minimum is 5 characters)')
     expect(note).not_to be_valid
   end
 
@@ -53,7 +53,7 @@ RSpec.describe Note, type: :model do
     expect(note).to have(0).errors_on(:notebook)
     expect(note).to have(0).errors_on(:notables)
 
-    expect(note.errors.full_messages).to include('Content is too long (maximum is 500 characters)')
+    expect(note.errors.full_messages).to contain_exactly('Content is too long (maximum is 500 characters)')
     expect(note).not_to be_valid
   end
 
@@ -70,6 +70,7 @@ RSpec.describe Note, type: :model do
     let!(:location_2) { FactoryBot.create(:notable, :location, notebook: notebook_2) }
 
     it 'is valid when notables are from same notebook' do
+      note.content = "@[#{character_1.name}](@#{character_1.id}):[#{item_1.name}](:#{item_1.id})#[#{location_1.name}](##{location_1.id})"
       note.notables << character_1
       note.notables << item_1
       note.notables << location_1
@@ -79,6 +80,11 @@ RSpec.describe Note, type: :model do
       expect(note).to have(0).errors_on(:notables)
 
       expect(note).to be_valid
+      note.save
+
+      expect(character_1.notes).to contain_exactly(note)
+      expect(item_1.notes).to contain_exactly(note)
+      expect(location_1.notes).to contain_exactly(note)
     end
 
     it 'is not valid when characters belong to a different notebook' do
@@ -89,7 +95,7 @@ RSpec.describe Note, type: :model do
       expect(note).to have(0).errors_on(:notebook)
       expect(note).to have(1).errors_on(:characters)
 
-      expect(note.errors.full_messages).to include('Characters must be from this notebook')
+      expect(note.errors.full_messages).to contain_exactly('Characters must be from this notebook')
       expect(note).not_to be_valid
     end
 
@@ -101,7 +107,7 @@ RSpec.describe Note, type: :model do
       expect(note).to have(0).errors_on(:notebook)
       expect(note).to have(1).errors_on(:items)
 
-      expect(note.errors.full_messages).to include('Items must be from this notebook')
+      expect(note.errors.full_messages).to contain_exactly('Items must be from this notebook')
       expect(note).not_to be_valid
     end
 
@@ -113,7 +119,7 @@ RSpec.describe Note, type: :model do
       expect(note).to have(0).errors_on(:notebook)
       expect(note).to have(1).errors_on(:locations)
 
-      expect(note.errors.full_messages).to include('Locations must be from this notebook')
+      expect(note.errors.full_messages).to contain_exactly('Locations must be from this notebook')
       expect(note).not_to be_valid
     end
   end
@@ -131,32 +137,16 @@ RSpec.describe Note, type: :model do
       let!(:character_3_content) { "@[#{character_3.name}](@#{character_3.id})"}
 
       it 'correctly links to multiple characters' do
-        note.content = "This is a note for #{character_1_content} and (#{character_2_content})"
-
-        note.save
+        note.update(content: "This is a note for #{character_1_content} and (#{character_2_content})")
 
         expect(note).to be_valid
         expect(note.notables.count).to eql 2
 
-        expect(note.notables.pluck(:id)).to include(character_1.id)
-        expect(note.notables.pluck(:name)).to include(character_1.name)
+        expect(note.notables.pluck(:id)).to contain_exactly(character_1.id, character_2.id)
+        expect(note.notables.pluck(:name)).to contain_exactly(character_1.name, character_2.name)
 
-        expect(note.notables.pluck(:id)).to include(character_2.id)
-        expect(note.notables.pluck(:name)).to include(character_2.name)
-
-        expect(note.notables.pluck(:id)).not_to include(character_3.id)
-        expect(note.notables.pluck(:name)).not_to include(character_3.name)
-
-        character_1.reload
-        character_2.reload
-        character_3.reload
-
-        expect(character_1.notes.length).to eql 1
-        expect(character_1.notes).to include(note)
-
-        expect(character_2.notes.length).to eql 1
-        expect(character_2.notes).to include(note)
-
+        expect(character_1.notes).to contain_exactly(note)
+        expect(character_2.notes).to contain_exactly(note)
         expect(character_3.notes.length).to eql 0
       end
 
@@ -165,19 +155,6 @@ RSpec.describe Note, type: :model do
 
         expect(note.notables.count).to eql 0
         expect(note.errors.full_messages).to include('Characters must be from this notebook')
-
-        expect(note.notables.pluck(:id)).not_to include(character_1.id)
-        expect(note.notables.pluck(:name)).not_to include(character_1.name)
-
-        expect(note.notables.pluck(:id)).not_to include(character_2.id)
-        expect(note.notables.pluck(:name)).not_to include(character_2.name)
-
-        expect(note.notables.pluck(:id)).not_to include(character_3.id)
-        expect(note.notables.pluck(:name)).not_to include(character_3.name)
-
-        character_1.reload
-        character_2.reload
-        character_3.reload
 
         expect(character_1.notes.length).to eql 0
         expect(character_2.notes.length).to eql 0
@@ -195,32 +172,16 @@ RSpec.describe Note, type: :model do
       let!(:item_3_content) { ":[#{item_3.name}](:#{item_3.id})"}
 
       it 'correctly links to multiple items' do
-        note.content = "This is a note for #{item_1_content} and (#{item_2_content})"
-
-        note.save
+        note.update(content: "This is a note for #{item_1_content} and (#{item_2_content})")
 
         expect(note).to be_valid
         expect(note.notables.count).to eql 2
 
-        expect(note.notables.pluck(:id)).to include(item_1.id)
-        expect(note.notables.pluck(:name)).to include(item_1.name)
+        expect(note.notables.pluck(:id)).to contain_exactly(item_1.id, item_2.id)
+        expect(note.notables.pluck(:name)).to contain_exactly(item_1.name, item_2.name)
 
-        expect(note.notables.pluck(:id)).to include(item_2.id)
-        expect(note.notables.pluck(:name)).to include(item_2.name)
-
-        expect(note.notables.pluck(:id)).not_to include(item_3.id)
-        expect(note.notables.pluck(:name)).not_to include(item_3.name)
-
-        item_1.reload
-        item_2.reload
-        item_3.reload
-
-        expect(item_1.notes.length).to eql 1
-        expect(item_1.notes).to include(note)
-
-        expect(item_2.notes.length).to eql 1
-        expect(item_2.notes).to include(note)
-
+        expect(item_1.notes).to contain_exactly(note)
+        expect(item_2.notes).to contain_exactly(note)
         expect(item_3.notes.length).to eql 0
       end
 
@@ -229,19 +190,6 @@ RSpec.describe Note, type: :model do
 
         expect(note.notables.count).to eql 0
         expect(note.errors.full_messages).to include('Items must be from this notebook')
-
-        expect(note.notables.pluck(:id)).not_to include(item_1.id)
-        expect(note.notables.pluck(:name)).not_to include(item_1.name)
-
-        expect(note.notables.pluck(:id)).not_to include(item_2.id)
-        expect(note.notables.pluck(:name)).not_to include(item_2.name)
-
-        expect(note.notables.pluck(:id)).not_to include(item_3.id)
-        expect(note.notables.pluck(:name)).not_to include(item_3.name)
-
-        item_1.reload
-        item_2.reload
-        item_3.reload
 
         expect(item_1.notes.length).to eql 0
         expect(item_2.notes.length).to eql 0
@@ -259,32 +207,16 @@ RSpec.describe Note, type: :model do
       let!(:location_3_content) { "#[#{location_3.name}](##{location_3.id})"}
 
       it 'correctly links to multiple locations' do
-        note.content = "This is a note for #{location_1_content} and (#{location_2_content})"
-
-        note.save
+        note.update(content: "This is a note for #{location_1_content} and (#{location_2_content})")
 
         expect(note).to be_valid
         expect(note.notables.count).to eql 2
 
-        expect(note.notables.pluck(:id)).to include(location_1.id)
-        expect(note.notables.pluck(:name)).to include(location_1.name)
+        expect(note.notables.pluck(:id)).to contain_exactly(location_1.id, location_2.id)
+        expect(note.notables.pluck(:name)).to contain_exactly(location_1.name, location_2.name)
 
-        expect(note.notables.pluck(:id)).to include(location_2.id)
-        expect(note.notables.pluck(:name)).to include(location_2.name)
-
-        expect(note.notables.pluck(:id)).not_to include(location_3.id)
-        expect(note.notables.pluck(:name)).not_to include(location_3.name)
-
-        location_1.reload
-        location_2.reload
-        location_3.reload
-
-        expect(location_1.notes.length).to eql 1
-        expect(location_1.notes).to include(note)
-
-        expect(location_2.notes.length).to eql 1
-        expect(location_2.notes).to include(note)
-
+        expect(location_1.notes).to contain_exactly(note)
+        expect(location_2.notes).to contain_exactly(note)
         expect(location_3.notes.length).to eql 0
       end
 
@@ -293,19 +225,6 @@ RSpec.describe Note, type: :model do
 
         expect(note.notables.count).to eql 0
         expect(note.errors.full_messages).to include('Locations must be from this notebook')
-
-        expect(note.notables.pluck(:id)).not_to include(location_1.id)
-        expect(note.notables.pluck(:name)).not_to include(location_1.name)
-
-        expect(note.notables.pluck(:id)).not_to include(location_2.id)
-        expect(note.notables.pluck(:name)).not_to include(location_2.name)
-
-        expect(note.notables.pluck(:id)).not_to include(location_3.id)
-        expect(note.notables.pluck(:name)).not_to include(location_3.name)
-
-        location_1.reload
-        location_2.reload
-        location_3.reload
 
         expect(location_1.notes.length).to eql 0
         expect(location_2.notes.length).to eql 0
@@ -323,34 +242,17 @@ RSpec.describe Note, type: :model do
       let!(:location_content) { "#[#{location.name}](##{location.id})"}
 
       it 'is successfully linked to all notables' do
-        note.content = "This is a note for #{character_content}, who visited #{location_content} and recovered #{item_content}"
-
-        note.save
+        note.update(content: "This is a note for #{character_content}, who visited #{location_content} and recovered #{item_content}")
 
         expect(note).to be_valid
         expect(note.notables.count).to eql 3
 
-        expect(note.notables.pluck(:id)).to include(character.id)
-        expect(note.notables.pluck(:name)).to include(character.name)
+        expect(note.notables.pluck(:id)).to contain_exactly(character.id, item.id, location.id)
+        expect(note.notables.pluck(:name)).to contain_exactly(character.name, item.name, location.name)
 
-        expect(note.notables.pluck(:id)).to include(item.id)
-        expect(note.notables.pluck(:name)).to include(item.name)
-
-        expect(note.notables.pluck(:id)).to include(location.id)
-        expect(note.notables.pluck(:name)).to include(location.name)
-
-        character.reload
-        item.reload
-        location.reload
-
-        expect(character.notes.length).to eql 1
-        expect(character.notes).to include(note)
-
-        expect(item.notes.length).to eql 1
-        expect(item.notes).to include(note)
-
-        expect(location.notes.length).to eql 1
-        expect(location.notes).to include(note)
+        expect(character.notes).to contain_exactly(note)
+        expect(item.notes).to contain_exactly(note)
+        expect(location.notes).to contain_exactly(note)
       end
     end
 
@@ -368,13 +270,10 @@ RSpec.describe Note, type: :model do
 
         expect(note.notables.count).to eql 1
 
-        expect(note.notables.pluck(:id)).to include(character.id)
-        expect(note.notables.pluck(:name)).to include(character.name)
+        expect(note.notables.pluck(:id)).to contain_exactly(character.id)
+        expect(note.notables.pluck(:name)).to contain_exactly(character.name)
 
-        character.reload
-
-        expect(character.notes.length).to eql 1
-        expect(character.notes).to include(note)
+        expect(character.notes).to contain_exactly(note)
 
         note.update(content: "#{item_content} can be found at #{location_content}")
         note.reload
@@ -382,26 +281,14 @@ RSpec.describe Note, type: :model do
         expect(note).to be_valid
         expect(note.notables.count).to eql 2
 
-        expect(note.notables.pluck(:id)).not_to include(character.id)
-        expect(note.notables.pluck(:name)).not_to include(character.name)
-
-        expect(note.notables.pluck(:id)).to include(item.id)
-        expect(note.notables.pluck(:name)).to include(item.name)
-
-        expect(note.notables.pluck(:id)).to include(location.id)
-        expect(note.notables.pluck(:name)).to include(location.name)
+        expect(note.notables.pluck(:id)).to contain_exactly(item.id, location.id)
+        expect(note.notables.pluck(:name)).to contain_exactly(item.name, location.name)
 
         character.reload
-        item.reload
-        location.reload
 
         expect(character.notes.length).to eql 0
-
-        expect(item.notes.length).to eql 1
-        expect(item.notes).to include(note)
-
-        expect(location.notes.length).to eql 1
-        expect(location.notes).to include(note)
+        expect(item.notes).to contain_exactly(note)
+        expect(location.notes).to contain_exactly(note)
       end
     end
   end
