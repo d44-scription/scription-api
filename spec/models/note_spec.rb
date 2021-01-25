@@ -115,50 +115,52 @@ RSpec.describe Note, type: :model do
     end
   end
 
-  describe 'linking to characters' do
+  describe 'linking hook' do
     let!(:notebook_2) { FactoryBot.create(:notebook) }
 
-    let!(:character_1) { FactoryBot.create(:notable, :character, notebook: notebook) }
-    let!(:character_2) { FactoryBot.create(:notable, :character, notebook: notebook) }
-    let!(:character_3) { FactoryBot.create(:notable, :character, notebook: notebook_2) }
+    describe 'when linking characters' do
+      let!(:character_1) { FactoryBot.create(:notable, :character, notebook: notebook) }
+      let!(:character_2) { FactoryBot.create(:notable, :character, notebook: notebook) }
+      let!(:character_3) { FactoryBot.create(:notable, :character, notebook: notebook_2) }
 
-    let!(:character_1_content) { "@[#{character_1.name}](@#{character_1.id})"}
-    let!(:character_2_content) { "@[#{character_2.name}](@#{character_2.id})"}
-    let!(:character_3_content) { "@[#{character_3.name}](@#{character_3.id})"}
+      let!(:character_1_content) { "@[#{character_1.name}](@#{character_1.id})"}
+      let!(:character_2_content) { "@[#{character_2.name}](@#{character_2.id})"}
+      let!(:character_3_content) { "@[#{character_3.name}](@#{character_3.id})"}
 
-    it 'correctly links to characters' do
-      note.content = "This is a note for #{character_1_content} and (#{character_2_content})"
+      it 'correctly links to multiple characters' do
+        note.content = "This is a note for #{character_1_content} and (#{character_2_content})"
 
-      note.save
+        note.save
 
-      expect(note).to be_valid
-      expect(note.notables.count).to eql 2
+        expect(note).to be_valid
+        expect(note.notables.count).to eql 2
 
-      expect(note.notables.pluck(:id)).to include(character_1.id)
-      expect(note.notables.pluck(:name)).to include(character_1.name)
+        expect(note.notables.pluck(:id)).to include(character_1.id)
+        expect(note.notables.pluck(:name)).to include(character_1.name)
 
-      expect(note.notables.pluck(:id)).to include(character_2.id)
-      expect(note.notables.pluck(:name)).to include(character_2.name)
+        expect(note.notables.pluck(:id)).to include(character_2.id)
+        expect(note.notables.pluck(:name)).to include(character_2.name)
 
-      expect(note.notables.pluck(:id)).not_to include(character_3.id)
-      expect(note.notables.pluck(:name)).not_to include(character_3.name)
-    end
+        expect(note.notables.pluck(:id)).not_to include(character_3.id)
+        expect(note.notables.pluck(:name)).not_to include(character_3.name)
+      end
 
-    it 'returns an error when linking a character from a different notebook' do
-      note.content = "This is a note for #{character_3_content}"
+      it 'returns an error when linking a character from a different notebook' do
+        note.content = "This is a note for #{character_3_content}"
 
-      expect(note).not_to be_valid
-      expect(note.notables.count).to eql 0
-      expect(note.errors.full_messages).to include('Characters must be from this notebook')
+        expect(note).not_to be_valid
+        expect(note.notables.count).to eql 0
+        expect(note.errors.full_messages).to include('Characters must be from this notebook')
 
-      expect(note.notables.pluck(:id)).not_to include(character_1.id)
-      expect(note.notables.pluck(:name)).not_to include(character_1.name)
+        expect(note.notables.pluck(:id)).not_to include(character_1.id)
+        expect(note.notables.pluck(:name)).not_to include(character_1.name)
 
-      expect(note.notables.pluck(:id)).not_to include(character_2.id)
-      expect(note.notables.pluck(:name)).not_to include(character_2.name)
+        expect(note.notables.pluck(:id)).not_to include(character_2.id)
+        expect(note.notables.pluck(:name)).not_to include(character_2.name)
 
-      expect(note.notables.pluck(:id)).not_to include(character_3.id)
-      expect(note.notables.pluck(:name)).not_to include(character_3.name)
+        expect(note.notables.pluck(:id)).not_to include(character_3.id)
+        expect(note.notables.pluck(:name)).not_to include(character_3.name)
+      end
     end
   end
 end
