@@ -6,6 +6,7 @@ class Note < ApplicationRecord
 
   before_validation :clear_notables
   before_validation :link_characters
+  before_validation :link_items
 
   validate :permitted_notables
   validates :notebook, presence: true
@@ -14,6 +15,7 @@ class Note < ApplicationRecord
   # RegEx for the format of a notable:
   # Trigger[Name](Trigger Id)
   CHARACTER_REGEX = /@\[[^@]*\]\(@\d\)/
+  ITEM_REGEX = /:\[[^:]*\]\(:\d\)/
 
   private
 
@@ -43,6 +45,26 @@ class Note < ApplicationRecord
         association(:notables).add_to_target(character)
       else
         errors.add(:characters, "must be from this notebook")
+      end
+    end
+  end
+
+  def link_items
+    # Find all matching instances of the regex
+    item_codes = content ? content.scan(ITEM_REGEX) : []
+
+    item_codes.each do |c|
+      # Remove the text surrounding the id
+      id = c.gsub(/:\[[^:]*\]\(:/, '').delete(')')
+
+      # Find the item
+      item = notebook.items.find_by(id: id)
+
+      if item
+        # Link the item to the notebook without saving
+        association(:notables).add_to_target(item)
+      else
+        errors.add(:items, "must be from this notebook")
       end
     end
   end

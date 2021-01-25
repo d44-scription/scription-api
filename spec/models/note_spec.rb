@@ -143,6 +143,18 @@ RSpec.describe Note, type: :model do
 
         expect(note.notables.pluck(:id)).not_to include(character_3.id)
         expect(note.notables.pluck(:name)).not_to include(character_3.name)
+
+        character_1.reload
+        character_2.reload
+        character_3.reload
+
+        expect(character_1.notes.length).to eql 1
+        expect(character_1.notes).to include(note)
+
+        expect(character_2.notes.length).to eql 1
+        expect(character_2.notes).to include(note)
+
+        expect(character_3.notes.length).to eql 0
       end
 
       it 'returns an error when linking a character from a different notebook' do
@@ -160,6 +172,79 @@ RSpec.describe Note, type: :model do
 
         expect(note.notables.pluck(:id)).not_to include(character_3.id)
         expect(note.notables.pluck(:name)).not_to include(character_3.name)
+
+        character_1.reload
+        character_2.reload
+        character_3.reload
+
+        expect(character_1.notes.length).to eql 0
+        expect(character_2.notes.length).to eql 0
+        expect(character_3.notes.length).to eql 0
+      end
+    end
+
+    describe 'when linking items' do
+      let!(:item_1) { FactoryBot.create(:notable, :item, notebook: notebook) }
+      let!(:item_2) { FactoryBot.create(:notable, :item, notebook: notebook) }
+      let!(:item_3) { FactoryBot.create(:notable, :item, notebook: notebook_2) }
+
+      let!(:item_1_content) { ":[#{item_1.name}](:#{item_1.id})"}
+      let!(:item_2_content) { ":[#{item_2.name}](:#{item_2.id})"}
+      let!(:item_3_content) { ":[#{item_3.name}](:#{item_3.id})"}
+
+      it 'correctly links to multiple items' do
+        note.content = "This is a note for #{item_1_content} and (#{item_2_content})"
+
+        note.save
+
+        expect(note).to be_valid
+        expect(note.notables.count).to eql 2
+
+        expect(note.notables.pluck(:id)).to include(item_1.id)
+        expect(note.notables.pluck(:name)).to include(item_1.name)
+
+        expect(note.notables.pluck(:id)).to include(item_2.id)
+        expect(note.notables.pluck(:name)).to include(item_2.name)
+
+        expect(note.notables.pluck(:id)).not_to include(item_3.id)
+        expect(note.notables.pluck(:name)).not_to include(item_3.name)
+
+        item_1.reload
+        item_2.reload
+        item_3.reload
+
+        expect(item_1.notes.length).to eql 1
+        expect(item_1.notes).to include(note)
+
+        expect(item_2.notes.length).to eql 1
+        expect(item_2.notes).to include(note)
+
+        expect(item_3.notes.length).to eql 0
+      end
+
+      it 'returns an error when linking a item from a different notebook' do
+        note.content = "This is a note for #{item_3_content}"
+
+        expect(note).not_to be_valid
+        expect(note.notables.count).to eql 0
+        expect(note.errors.full_messages).to include('Items must be from this notebook')
+
+        expect(note.notables.pluck(:id)).not_to include(item_1.id)
+        expect(note.notables.pluck(:name)).not_to include(item_1.name)
+
+        expect(note.notables.pluck(:id)).not_to include(item_2.id)
+        expect(note.notables.pluck(:name)).not_to include(item_2.name)
+
+        expect(note.notables.pluck(:id)).not_to include(item_3.id)
+        expect(note.notables.pluck(:name)).not_to include(item_3.name)
+
+        item_1.reload
+        item_2.reload
+        item_3.reload
+
+        expect(item_1.notes.length).to eql 0
+        expect(item_2.notes.length).to eql 0
+        expect(item_3.notes.length).to eql 0
       end
     end
   end
