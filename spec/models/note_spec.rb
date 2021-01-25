@@ -247,5 +247,70 @@ RSpec.describe Note, type: :model do
         expect(item_3.notes.length).to eql 0
       end
     end
+
+    describe 'when linking locations' do
+      let!(:location_1) { FactoryBot.create(:notable, :location, notebook: notebook) }
+      let!(:location_2) { FactoryBot.create(:notable, :location, notebook: notebook) }
+      let!(:location_3) { FactoryBot.create(:notable, :location, notebook: notebook_2) }
+
+      let!(:location_1_content) { "#[#{location_1.name}](##{location_1.id})"}
+      let!(:location_2_content) { "#[#{location_2.name}](##{location_2.id})"}
+      let!(:location_3_content) { "#[#{location_3.name}](##{location_3.id})"}
+
+      it 'correctly links to multiple locations' do
+        note.content = "This is a note for #{location_1_content} and (#{location_2_content})"
+
+        note.save
+
+        expect(note).to be_valid
+        expect(note.notables.count).to eql 2
+
+        expect(note.notables.pluck(:id)).to include(location_1.id)
+        expect(note.notables.pluck(:name)).to include(location_1.name)
+
+        expect(note.notables.pluck(:id)).to include(location_2.id)
+        expect(note.notables.pluck(:name)).to include(location_2.name)
+
+        expect(note.notables.pluck(:id)).not_to include(location_3.id)
+        expect(note.notables.pluck(:name)).not_to include(location_3.name)
+
+        location_1.reload
+        location_2.reload
+        location_3.reload
+
+        expect(location_1.notes.length).to eql 1
+        expect(location_1.notes).to include(note)
+
+        expect(location_2.notes.length).to eql 1
+        expect(location_2.notes).to include(note)
+
+        expect(location_3.notes.length).to eql 0
+      end
+
+      it 'returns an error when linking a location from a different notebook' do
+        note.content = "This is a note for #{location_3_content}"
+
+        expect(note).not_to be_valid
+        expect(note.notables.count).to eql 0
+        expect(note.errors.full_messages).to include('Locations must be from this notebook')
+
+        expect(note.notables.pluck(:id)).not_to include(location_1.id)
+        expect(note.notables.pluck(:name)).not_to include(location_1.name)
+
+        expect(note.notables.pluck(:id)).not_to include(location_2.id)
+        expect(note.notables.pluck(:name)).not_to include(location_2.name)
+
+        expect(note.notables.pluck(:id)).not_to include(location_3.id)
+        expect(note.notables.pluck(:name)).not_to include(location_3.name)
+
+        location_1.reload
+        location_2.reload
+        location_3.reload
+
+        expect(location_1.notes.length).to eql 0
+        expect(location_2.notes.length).to eql 0
+        expect(location_3.notes.length).to eql 0
+      end
+    end
   end
 end
