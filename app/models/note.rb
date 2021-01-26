@@ -4,9 +4,10 @@ class Note < ApplicationRecord
   belongs_to :notebook
   has_and_belongs_to_many :notables
 
-  validate :link_notables
   validates :notebook, presence: true
   validates :content, presence: true, length: { in: 5..500 }
+  validate :link_notables
+  validate :forbidden_characters
 
   def notable_message
     notables.any? ? "Note linked to: #{notables.pluck(:name).join("/")}" : 'Note linked to no notables'
@@ -29,6 +30,20 @@ class Note < ApplicationRecord
       link_characters if content.match(regex_for(Character::TRIGGER))
       link_items if content.match(regex_for(Item::TRIGGER))
       link_locations if content.match(regex_for(Location::TRIGGER))
+    end
+  end
+
+  def forbidden_characters
+    if content
+      stripped_content = content.dup
+
+      Notable::TRIGGERS.each do |trigger|
+        stripped_content.scan(regex_for(trigger)).map { |code| stripped_content.slice!(code) }
+      end
+
+      if Notable::TRIGGERS.any? { |trigger| stripped_content.include?(trigger) }
+        errors.add(:content, 'cannot include trigger characters outside of use')
+      end
     end
   end
 
