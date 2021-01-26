@@ -11,7 +11,7 @@ RSpec.describe Notable, type: :model do
     it 'is not valid without a set type' do
       expect(notable).to have(2).errors_on(:type)
 
-      expect(notable.errors.full_messages).to include('Type must be one of Item/Character/Location', 'Type can\'t be blank')
+      expect(notable.errors.full_messages).to contain_exactly('Type must be one of Item/Character/Location', 'Type can\'t be blank')
       expect(notable).not_to be_valid
     end
 
@@ -19,7 +19,7 @@ RSpec.describe Notable, type: :model do
       notable.type = 'Invalid'
       expect(notable).to have(1).errors_on(:type)
 
-      expect(notable.errors.full_messages).to include('Type must be one of Item/Character/Location')
+      expect(notable.errors.full_messages).to contain_exactly('Type must be one of Item/Character/Location')
       expect(notable).not_to be_valid
     end
   end
@@ -47,7 +47,7 @@ RSpec.describe Notable, type: :model do
       expect(item).to have(1).errors_on(:name)
       expect(item).to have(0).errors_on(:notebook)
 
-      expect(item.errors.full_messages).to include('Name can\'t be blank')
+      expect(item.errors.full_messages).to contain_exactly('Name can\'t be blank')
       expect(item).not_to be_valid
     end
 
@@ -58,7 +58,7 @@ RSpec.describe Notable, type: :model do
       expect(item).to have(0).errors_on(:name)
       expect(item).to have(2).errors_on(:notebook)
 
-      expect(item.errors.full_messages).to include('Notebook can\'t be blank', 'Notebook must exist')
+      expect(item.errors.full_messages).to contain_exactly('Notebook can\'t be blank', 'Notebook must exist')
       expect(item).not_to be_valid
     end
   end
