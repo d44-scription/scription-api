@@ -10,7 +10,7 @@ gem 'rails', '~> 6.0.3', '>= 6.0.3.4'
 # Use postgresql as the database for Active Record
 gem 'pg', '>= 0.18', '< 2.0'
 # Use Puma as the app server
-gem 'puma', '~> 4.1'
+gem 'puma', '~> 5.1'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.7'
 
@@ -28,7 +28,7 @@ group :development, :test do
   # Use collection matchers for RSpec
   gem 'rspec-collection_matchers', '~> 1.1', '>= 1.1.2'
   # Print a report of the test coverage %
-  gem 'simplecov', '~> 0.19.1'
+  gem 'simplecov', '~> 0.21.2'
   # Use FactoryBot to create test data
   gem 'factory_bot_rails', '~> 5.0', '>= 5.0.2'
 end
