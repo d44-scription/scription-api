@@ -30,7 +30,7 @@ group :development, :test do
   # Print a report of the test coverage %
   gem 'simplecov', '~> 0.21.2'
   # Use FactoryBot to create test data
-  gem 'factory_bot_rails', '~> 5.0', '>= 5.0.2'
+  gem 'factory_bot_rails', '~> 6.1', '>= 6.1.0'
 end
 
 group :development do
