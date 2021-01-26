@@ -4,10 +4,14 @@ module Api
   module V1
     class NotablesController < ApplicationController
       before_action :fetch_notebook
-      before_action :fetch_notable, only: %i[show update destroy]
+      before_action :fetch_notable, only: %i[notes show update destroy]
 
       def index
         @notables = @notebook.notables.order(:type)
+      end
+
+      def notes
+        @notes = @notable.notes
       end
 
       def create

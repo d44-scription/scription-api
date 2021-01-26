@@ -44,6 +44,30 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
     end
   end
 
+  describe 'GET /notes' do
+    let!(:note_1) { FactoryBot.create(:note, notebook: notebook_1, content: "Note 1 :[#{item.name}](:#{item.id})")}
+    let!(:note_2) { FactoryBot.create(:note, notebook: notebook_1, content: "Note 2 :[#{item.name}](:#{item.id})")}
+
+    it 'retrieves all notes for current notable' do
+      get notes_api_v1_notebook_notable_path(notebook_1, item), headers: valid_headers, as: :json
+
+      expect(response).to be_successful
+      expect(response.body).to include(note_1.content)
+      expect(response.body).to include(note_2.content)
+
+      expect(response.body).to include('success_message')
+      expect(response.body).to include("Note linked to: #{item.name}")
+
+      expect(response.body).not_to include(invalid_item.name)
+      expect(response.body).not_to include(character.name)
+      expect(response.body).not_to include(location.name)
+
+      expect(response.body).not_to include(item_attributes[:name])
+      expect(response.body).not_to include(character_attributes[:name])
+      expect(response.body).not_to include(location_attributes[:name])
+    end
+  end
+
   describe 'GET /show' do
     it 'renders a successful response when note is linked to given notebook' do
       get api_v1_notebook_notable_url(notebook_1, item), as: :json
