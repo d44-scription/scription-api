@@ -15,7 +15,7 @@ class Note < ApplicationRecord
   private
 
   def regex_for(trigger)
-    /#{trigger}\[[^#{trigger}]*\]\(#{trigger}\d\)/
+    /#{trigger}\[[^#{trigger}]*\]\(#{trigger}\d+\)/
   end
 
   def trim_for_id(code, trigger)
