@@ -9,7 +9,6 @@ RSpec.describe Note, type: :model do
   it 'is valid when attributes are correct' do
     expect(note).to have(0).errors_on(:content)
     expect(note).to have(0).errors_on(:notebook)
-    expect(note).to have(0).errors_on(:notables)
 
     expect(note).to be_valid
   end
@@ -19,7 +18,6 @@ RSpec.describe Note, type: :model do
 
     expect(note).to have(2).errors_on(:content)
     expect(note).to have(0).errors_on(:notebook)
-    expect(note).to have(0).errors_on(:notables)
 
     expect(note.errors.full_messages).to contain_exactly('Content can\'t be blank', 'Content is too short (minimum is 5 characters)')
     expect(note).not_to be_valid
@@ -40,7 +38,6 @@ RSpec.describe Note, type: :model do
 
     expect(note).to have(1).errors_on(:content)
     expect(note).to have(0).errors_on(:notebook)
-    expect(note).to have(0).errors_on(:notables)
 
     expect(note.errors.full_messages).to contain_exactly('Content is too short (minimum is 5 characters)')
     expect(note).not_to be_valid
@@ -51,7 +48,6 @@ RSpec.describe Note, type: :model do
 
     expect(note).to have(1).errors_on(:content)
     expect(note).to have(0).errors_on(:notebook)
-    expect(note).to have(0).errors_on(:notables)
 
     expect(note.errors.full_messages).to contain_exactly('Content is too long (maximum is 500 characters)')
     expect(note).not_to be_valid
@@ -75,7 +71,10 @@ RSpec.describe Note, type: :model do
 
       expect(note).to have(0).errors_on(:content)
       expect(note).to have(0).errors_on(:notebook)
-      expect(note).to have(0).errors_on(:notables)
+
+      expect(note).to have(0).errors_on(:characters)
+      expect(note).to have(0).errors_on(:items)
+      expect(note).to have(0).errors_on(:locations)
 
       expect(note).to be_valid
       note.save
@@ -115,6 +114,62 @@ RSpec.describe Note, type: :model do
       expect(note).to have(1).errors_on(:locations)
 
       expect(note.errors.full_messages).to contain_exactly('Locations must be from this notebook')
+      expect(note).not_to be_valid
+    end
+
+    it 'is valid when content includes triggers only in links' do
+      note.content = "Note content @[#{character_1.name}](@#{character_1.id}) :[#{item_1.name}](:#{item_1.id}) #[#{location_1.name}](##{location_1.id})"
+
+      expect(note).to have(0).errors_on(:content)
+      expect(note).to have(0).errors_on(:notebook)
+
+      expect(note).to have(0).errors_on(:characters)
+      expect(note).to have(0).errors_on(:items)
+      expect(note).to have(0).errors_on(:locations)
+
+      expect(note.errors.full_messages).to be_empty
+      expect(note).to be_valid
+    end
+
+    it 'is not valid when content includes : outside of links' do
+      note.content = "Note: @[#{character_1.name}](@#{character_1.id}) :[#{item_1.name}](:#{item_1.id}) #[#{location_1.name}](##{location_1.id})"
+
+      expect(note).to have(1).errors_on(:content)
+      expect(note).to have(0).errors_on(:notebook)
+
+      expect(note).to have(0).errors_on(:characters)
+      expect(note).to have(0).errors_on(:items)
+      expect(note).to have(0).errors_on(:locations)
+
+      expect(note.errors.full_messages).to contain_exactly('Content cannot include trigger characters outside of use')
+      expect(note).not_to be_valid
+    end
+
+    it 'is not valid when content includes @ outside of links' do
+      note.content = "Note @ @[#{character_1.name}](@#{character_1.id}):[#{item_1.name}](:#{item_1.id})#[#{location_1.name}](##{location_1.id})"
+
+      expect(note).to have(1).errors_on(:content)
+      expect(note).to have(0).errors_on(:notebook)
+
+      expect(note).to have(0).errors_on(:characters)
+      expect(note).to have(0).errors_on(:items)
+      expect(note).to have(0).errors_on(:locations)
+
+      expect(note.errors.full_messages).to contain_exactly('Content cannot include trigger characters outside of use')
+      expect(note).not_to be_valid
+    end
+
+    it 'is not valid when content includes # outside of links' do
+      note.content = "Note# @[#{character_1.name}](@#{character_1.id}) :[#{item_1.name}](:#{item_1.id}) #[#{location_1.name}](##{location_1.id})"
+
+      expect(note).to have(1).errors_on(:content)
+      expect(note).to have(0).errors_on(:notebook)
+
+      expect(note).to have(0).errors_on(:characters)
+      expect(note).to have(0).errors_on(:items)
+      expect(note).to have(0).errors_on(:locations)
+
+      expect(note.errors.full_messages).to contain_exactly('Content cannot include trigger characters outside of use')
       expect(note).not_to be_valid
     end
   end
