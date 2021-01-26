@@ -94,6 +94,24 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
       end
     end
 
+    context 'with a link to an invalid notable' do
+      let(:notable) { FactoryBot.create(:notable, :character, notebook: notebook_2) }
+      let(:invalid_attributes) { FactoryBot.attributes_for(:note, notebook: notebook_1, content: "@[#{notable.name}](@#{notable.id})") }
+
+      it "renders a JSON response with errors for the note" do
+        expect do
+          post api_v1_notebook_notes_url(notebook_1),
+               params: invalid_attributes, headers: valid_headers, as: :json
+        end.to change(notebook_1.notes, :count).by(0)
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.content_type).to eq("application/json; charset=utf-8")
+
+        expect(response.body).to include('Characters must be from this notebook')
+        expect(notable.notes).to be_empty
+      end
+    end
+
     context 'with invalid parameters' do
       it 'does not create a new Note' do
         expect do
@@ -142,11 +160,11 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
       end
     end
 
-    context 'with a link to a notable' do
+    context "with a link to a notable" do
       let(:notable) { FactoryBot.create(:notable, :character, notebook: notebook_1) }
       let(:new_attributes) { FactoryBot.attributes_for(:note, notebook: notebook_1, content: "@[#{notable.name}](@#{notable.id})") }
 
-      it 'updates the requested note' do
+      it "updates the requested note" do
         expect do
           patch api_v1_notebook_note_url(notebook_1, note_1),
                 params: new_attributes, headers: valid_headers, as: :json
@@ -157,12 +175,12 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
         expect(notable.notes).to contain_exactly(note_1)
       end
 
-      it 'renders a JSON response with the new note' do
+      it "renders a JSON response with the new note" do
         patch api_v1_notebook_note_url(notebook_1, note_1),
               params: new_attributes, headers: valid_headers, as: :json
 
         expect(response).to have_http_status(:ok)
-        expect(response.content_type).to match(a_string_including('application/json'))
+        expect(response.content_type).to match(a_string_including("application/json"))
 
         expect(response.body).not_to include(note_1.content)
         expect(response.body).not_to include(note_2.content)
@@ -170,6 +188,27 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
         expect(response.body).to include("Note linked to: #{notable.name}")
 
         expect(notable.notes).to contain_exactly(note_1)
+      end
+    end
+
+    context 'with a link to an invalid notable' do
+      let(:notable) { FactoryBot.create(:notable, :character, notebook: notebook_2) }
+      let(:invalid_attributes) { FactoryBot.attributes_for(:note, notebook: notebook_1, content: "@[#{notable.name}](@#{notable.id})") }
+
+      it "renders a JSON response with errors for the note" do
+        expect do
+          patch api_v1_notebook_note_url(notebook_1, note_1),
+                params: invalid_attributes, headers: valid_headers, as: :json
+        end.to change(notebook_1.notes, :count).by(0)
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.content_type).to eq("application/json; charset=utf-8")
+
+        note_1.reload
+        expect(note_1.content).to eql("Note 1")
+
+        expect(response.body).to include('Characters must be from this notebook')
+        expect(notable.notes).to be_empty
       end
     end
 
