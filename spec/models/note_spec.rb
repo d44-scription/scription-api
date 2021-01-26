@@ -60,7 +60,8 @@ RSpec.describe Note, type: :model do
   describe 'with notables' do
     let!(:notebook_2) { FactoryBot.create(:notebook) }
 
-    let!(:character_1) { FactoryBot.create(:notable, :character, notebook: notebook) }
+    # Cofnirm regex matches id's longer than 1 character
+    let!(:character_1) { FactoryBot.create(:notable, :character, id: 150, notebook: notebook) }
     let!(:character_2) { FactoryBot.create(:notable, :character, notebook: notebook_2) }
 
     let!(:item_1) { FactoryBot.create(:notable, :item, notebook: notebook) }
@@ -71,9 +72,6 @@ RSpec.describe Note, type: :model do
 
     it 'is valid when notables are from same notebook' do
       note.content = "@[#{character_1.name}](@#{character_1.id}):[#{item_1.name}](:#{item_1.id})#[#{location_1.name}](##{location_1.id})"
-      note.notables << character_1
-      note.notables << item_1
-      note.notables << location_1
 
       expect(note).to have(0).errors_on(:content)
       expect(note).to have(0).errors_on(:notebook)
@@ -89,7 +87,6 @@ RSpec.describe Note, type: :model do
 
     it 'is not valid when characters belong to a different notebook' do
       note.content = "@[#{character_2.name}](@#{character_2.id})"
-      note.notables << character_2
 
       expect(note).to have(0).errors_on(:content)
       expect(note).to have(0).errors_on(:notebook)
@@ -101,7 +98,6 @@ RSpec.describe Note, type: :model do
 
     it 'is not valid when items belong to a different notebook' do
       note.content = ":[#{item_2.name}](:#{item_2.id})"
-      note.notables << item_2
 
       expect(note).to have(0).errors_on(:content)
       expect(note).to have(0).errors_on(:notebook)
@@ -113,7 +109,6 @@ RSpec.describe Note, type: :model do
 
     it 'is not valid when locations belong to a different notebook' do
       note.content = "#[#{location_2.name}](##{location_2.id})"
-      note.notables << location_2
 
       expect(note).to have(0).errors_on(:content)
       expect(note).to have(0).errors_on(:notebook)
@@ -128,7 +123,7 @@ RSpec.describe Note, type: :model do
     let!(:notebook_2) { FactoryBot.create(:notebook) }
 
     describe 'when linking characters' do
-      let!(:character_1) { FactoryBot.create(:notable, :character, notebook: notebook) }
+      let!(:character_1) { FactoryBot.create(:notable, :character, id: 150, notebook: notebook) }
       let!(:character_2) { FactoryBot.create(:notable, :character, notebook: notebook) }
       let!(:character_3) { FactoryBot.create(:notable, :character, notebook: notebook_2) }
 
@@ -163,7 +158,7 @@ RSpec.describe Note, type: :model do
     end
 
     describe 'when linking items' do
-      let!(:item_1) { FactoryBot.create(:notable, :item, notebook: notebook) }
+      let!(:item_1) { FactoryBot.create(:notable, :item, id: 150, notebook: notebook) }
       let!(:item_2) { FactoryBot.create(:notable, :item, notebook: notebook) }
       let!(:item_3) { FactoryBot.create(:notable, :item, notebook: notebook_2) }
 
@@ -198,7 +193,7 @@ RSpec.describe Note, type: :model do
     end
 
     describe 'when linking locations' do
-      let!(:location_1) { FactoryBot.create(:notable, :location, notebook: notebook) }
+      let!(:location_1) { FactoryBot.create(:notable, :location, id: 150, notebook: notebook) }
       let!(:location_2) { FactoryBot.create(:notable, :location, notebook: notebook) }
       let!(:location_3) { FactoryBot.create(:notable, :location, notebook: notebook_2) }
 
@@ -233,7 +228,7 @@ RSpec.describe Note, type: :model do
     end
 
     describe 'when linking multiple types of notable' do
-      let!(:character) { FactoryBot.create(:notable, :character, notebook: notebook) }
+      let!(:character) { FactoryBot.create(:notable, :character, id: 150, notebook: notebook) }
       let!(:item) { FactoryBot.create(:notable, :item, notebook: notebook) }
       let!(:location) { FactoryBot.create(:notable, :location, notebook: notebook) }
 
