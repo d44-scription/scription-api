@@ -60,7 +60,7 @@ RSpec.describe Note, type: :model do
   describe 'with notables' do
     let!(:notebook_2) { FactoryBot.create(:notebook) }
 
-    # Cofnirm regex matches id's longer than 1 character
+    # Confirm regex matches id's longer than 1 character
     let!(:character_1) { FactoryBot.create(:notable, :character, id: 150, notebook: notebook) }
     let!(:character_2) { FactoryBot.create(:notable, :character, notebook: notebook_2) }
 
@@ -123,6 +123,7 @@ RSpec.describe Note, type: :model do
     let!(:notebook_2) { FactoryBot.create(:notebook) }
 
     describe 'when linking characters' do
+      # Confirm regex matches id's longer than 1 character
       let!(:character_1) { FactoryBot.create(:notable, :character, id: 150, notebook: notebook) }
       let!(:character_2) { FactoryBot.create(:notable, :character, notebook: notebook) }
       let!(:character_3) { FactoryBot.create(:notable, :character, notebook: notebook_2) }
@@ -158,6 +159,7 @@ RSpec.describe Note, type: :model do
     end
 
     describe 'when linking items' do
+      # Confirm regex matches id's longer than 1 character
       let!(:item_1) { FactoryBot.create(:notable, :item, id: 150, notebook: notebook) }
       let!(:item_2) { FactoryBot.create(:notable, :item, notebook: notebook) }
       let!(:item_3) { FactoryBot.create(:notable, :item, notebook: notebook_2) }
@@ -193,6 +195,7 @@ RSpec.describe Note, type: :model do
     end
 
     describe 'when linking locations' do
+      # Confirm regex matches id's longer than 1 character
       let!(:location_1) { FactoryBot.create(:notable, :location, id: 150, notebook: notebook) }
       let!(:location_2) { FactoryBot.create(:notable, :location, notebook: notebook) }
       let!(:location_3) { FactoryBot.create(:notable, :location, notebook: notebook_2) }
