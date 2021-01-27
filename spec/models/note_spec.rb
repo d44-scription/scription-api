@@ -117,8 +117,8 @@ RSpec.describe Note, type: :model do
       expect(note).not_to be_valid
     end
 
-    it 'is valid when content includes triggers only in links' do
-      content = "Note content @[#{character_1.name}](@#{character_1.id}) :[#{item_1.name}](:#{item_1.id}) #[#{location_1.name}](##{location_1.id})"
+    it 'is valid when content includes [] only in links' do
+      content = "Not@e content @@ @[#{character_1.name}](@#{character_1.id}) ::[#{item_1.name}](:#{item_1.id}) ####  # # #[#{location_1.name}](##{location_1.id})"
       note.content = content
 
       expect(note).to have(0).errors_on(:content)
@@ -133,8 +133,8 @@ RSpec.describe Note, type: :model do
       expect(note.content).to eql(content)
     end
 
-    it 'is not valid when content includes : outside of links' do
-      content = "Note : @[#{character_1.name}](@#{character_1.id})::[#{item_1.name}](:#{item_1.id}):#[#{location_1.name}](##{location_1.id})"
+    it 'is not valid when content includes [ outside of links' do
+      content = "Note #@: @[#{character_1.name}](@#{character_1.id})[ @:[#{item_1.name}](:#{item_1.id})[####[#{location_1.name}](##{location_1.id})"
       note.content = content
 
       expect(note).to have(1).errors_on(:content)
@@ -144,13 +144,13 @@ RSpec.describe Note, type: :model do
       expect(note).to have(0).errors_on(:items)
       expect(note).to have(0).errors_on(:locations)
 
-      expect(note.errors.full_messages).to contain_exactly('Content cannot include trigger characters outside of use')
+      expect(note.errors.full_messages).to contain_exactly('Content cannot include square bracket characters')
       expect(note).not_to be_valid
       expect(note.content).to eql(content)
     end
 
-    it 'is not valid when content includes @ outside of links' do
-      content = "Note @ @[#{character_1.name}](@#{character_1.id}):[#{item_1.name}](:#{item_1.id})#[#{location_1.name}](##{location_1.id})@"
+    it 'is not valid when content includes ] outside of links' do
+      content = "Note @ @[#{character_1.name}](@#{character_1.id})]:[#{item_1.name}](:#{item_1.id})#[#{location_1.name}](##{location_1.id})@"
       note.content = content
 
       expect(note).to have(1).errors_on(:content)
@@ -160,23 +160,7 @@ RSpec.describe Note, type: :model do
       expect(note).to have(0).errors_on(:items)
       expect(note).to have(0).errors_on(:locations)
 
-      expect(note.errors.full_messages).to contain_exactly('Content cannot include trigger characters outside of use')
-      expect(note).not_to be_valid
-      expect(note.content).to eql(content)
-    end
-
-    it 'is not valid when content includes # outside of links' do
-      content = "Note# @[#{character_1.name}](@#{character_1.id}) :[#{item_1.name}](:#{item_1.id}) #[#{location_1.name}](##{location_1.id})"
-      note.content = content
-
-      expect(note).to have(1).errors_on(:content)
-      expect(note).to have(0).errors_on(:notebook)
-
-      expect(note).to have(0).errors_on(:characters)
-      expect(note).to have(0).errors_on(:items)
-      expect(note).to have(0).errors_on(:locations)
-
-      expect(note.errors.full_messages).to contain_exactly('Content cannot include trigger characters outside of use')
+      expect(note.errors.full_messages).to contain_exactly('Content cannot include square bracket characters')
       expect(note).not_to be_valid
       expect(note.content).to eql(content)
     end
