@@ -10,17 +10,17 @@ class Note < ApplicationRecord
   validate :forbidden_characters
 
   def notable_message
-    notables.any? ? "Note linked to: #{notables.pluck(:name).join("/")}" : 'Note linked to no notables'
+    notables.any? ? "Note linked to: #{notables.pluck(:name).join('/')}" : 'Note linked to no notables'
   end
 
   private
 
   def regex_for(trigger)
-    /#{trigger}\[[^#{trigger}]*\]\(#{trigger}\d+\)/
+    /#{trigger}\[[^\]]+\]\(#{trigger}\d+\)/
   end
 
   def trim_for_id(code, trigger)
-    code.gsub(/#{trigger}\[[^#{trigger}]*\]\(#{trigger}/, '').delete(')')
+    code.gsub(/#{trigger}\[[^\]]+\]\(#{trigger}/, '').delete(')')
   end
 
   def link_notables
@@ -41,9 +41,7 @@ class Note < ApplicationRecord
         stripped_content.scan(regex_for(trigger)).map { |code| stripped_content.slice!(code) }
       end
 
-      if Notable::TRIGGERS.any? { |trigger| stripped_content.include?(trigger) }
-        errors.add(:content, 'cannot include trigger characters outside of use')
-      end
+      errors.add(:content, 'cannot include square bracket characters') if ['[', ']'].any? { |trigger| stripped_content.include?(trigger) }
     end
   end
 
@@ -62,7 +60,7 @@ class Note < ApplicationRecord
         # Link the character to the notebook
         notables << character
       else
-        errors.add(:characters, "must be from this notebook")
+        errors.add(:characters, 'must be from this notebook')
       end
     end
   end
@@ -82,7 +80,7 @@ class Note < ApplicationRecord
         # Link the item to the notebook
         notables << item
       else
-        errors.add(:items, "must be from this notebook")
+        errors.add(:items, 'must be from this notebook')
       end
     end
   end
@@ -102,7 +100,7 @@ class Note < ApplicationRecord
         # Link the location to the notebook
         notables << location
       else
-        errors.add(:locations, "must be from this notebook")
+        errors.add(:locations, 'must be from this notebook')
       end
     end
   end

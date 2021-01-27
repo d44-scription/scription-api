@@ -32,11 +32,11 @@ RSpec.describe '/api/v1/notebooks/:id/items', type: :request do
     end
 
     describe 'when searching' do
-      let!(:item_3) { FactoryBot.create(:notable, :item, notebook: notebook_1, name: "Different Item") }
-      let!(:item_4) { FactoryBot.create(:notable, :item, notebook: notebook_1, name: "Another Item") }
+      let!(:item_3) { FactoryBot.create(:notable, :item, notebook: notebook_1, name: 'Different Item') }
+      let!(:item_4) { FactoryBot.create(:notable, :item, notebook: notebook_1, name: 'Another Item') }
 
       it 'returns a subset of items matching the search query' do
-        get api_v1_notebook_items_url(notebook_1, q: "Different"), headers: valid_headers, as: :json
+        get api_v1_notebook_items_url(notebook_1, q: 'Different'), headers: valid_headers, as: :json
 
         expect(response).to be_successful
         expect(response.body).not_to include(item_1.name)
@@ -49,7 +49,7 @@ RSpec.describe '/api/v1/notebooks/:id/items', type: :request do
       end
 
       it 'returns an empty array when no items match the query' do
-        get api_v1_notebook_items_url(notebook_1, q: "TEST"), headers: valid_headers, as: :json
+        get api_v1_notebook_items_url(notebook_1, q: 'TEST'), headers: valid_headers, as: :json
 
         expect(response).to be_successful
         expect(response.body).not_to include(item_1.name)
@@ -62,7 +62,7 @@ RSpec.describe '/api/v1/notebooks/:id/items', type: :request do
       end
 
       it 'returns all items when all match the query' do
-        get api_v1_notebook_items_url(notebook_1, q: "Item"), headers: valid_headers, as: :json
+        get api_v1_notebook_items_url(notebook_1, q: 'Item'), headers: valid_headers, as: :json
 
         expect(response).to be_successful
         expect(response.body).to include(item_1.name)
@@ -75,7 +75,7 @@ RSpec.describe '/api/v1/notebooks/:id/items', type: :request do
       end
 
       it 'ignores case when searching' do
-        get api_v1_notebook_items_url(notebook_1, q: "aNoThEr"), headers: valid_headers, as: :json
+        get api_v1_notebook_items_url(notebook_1, q: 'aNoThEr'), headers: valid_headers, as: :json
 
         expect(response).to be_successful
         expect(response.body).not_to include(item_1.name)
