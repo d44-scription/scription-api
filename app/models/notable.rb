@@ -10,7 +10,6 @@ class Notable < ApplicationRecord
   validates :name, presence: true
 
   TYPES = %w[Item Character Location].freeze
-
   private
 
   def permitted_type
