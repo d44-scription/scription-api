@@ -11,7 +11,7 @@
 
   puts("  Creating notes for #{n.name}")
   3.times do |j|
-    n.notes.create!(content: "Test note #{i}:#{j}")
+    n.notes.create!(content: "Test note #{i} - #{j}")
   end
 
   puts("  Creating items for #{n.name}")
