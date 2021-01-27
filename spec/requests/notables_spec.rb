@@ -45,8 +45,8 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
   end
 
   describe 'GET /notes' do
-    let!(:note_1) { FactoryBot.create(:note, notebook: notebook_1, content: "Note 1 :[#{item.name}](:#{item.id})")}
-    let!(:note_2) { FactoryBot.create(:note, notebook: notebook_1, content: "Note 2 :[#{item.name}](:#{item.id})")}
+    let!(:note_1) { FactoryBot.create(:note, notebook: notebook_1, content: "Note 1 :[#{item.name}](:#{item.id})") }
+    let!(:note_2) { FactoryBot.create(:note, notebook: notebook_1, content: "Note 2 :[#{item.name}](:#{item.id})") }
 
     it 'retrieves all notes for current notable' do
       get notes_api_v1_notebook_notable_path(notebook_1, item), headers: valid_headers, as: :json

@@ -175,9 +175,9 @@ RSpec.describe Note, type: :model do
       let!(:character_2) { FactoryBot.create(:notable, :character, notebook: notebook) }
       let!(:character_3) { FactoryBot.create(:notable, :character, notebook: notebook_2) }
 
-      let!(:character_1_content) { "@[#{character_1.name}](@#{character_1.id})"}
-      let!(:character_2_content) { "@[#{character_2.name}](@#{character_2.id})"}
-      let!(:character_3_content) { "@[#{character_3.name}](@#{character_3.id})"}
+      let!(:character_1_content) { "@[#{character_1.name}](@#{character_1.id})" }
+      let!(:character_2_content) { "@[#{character_2.name}](@#{character_2.id})" }
+      let!(:character_3_content) { "@[#{character_3.name}](@#{character_3.id})" }
 
       it 'correctly links to multiple characters' do
         note.update(content: "This is a note for #{character_1_content} and (#{character_2_content})")
@@ -211,9 +211,9 @@ RSpec.describe Note, type: :model do
       let!(:item_2) { FactoryBot.create(:notable, :item, notebook: notebook) }
       let!(:item_3) { FactoryBot.create(:notable, :item, notebook: notebook_2) }
 
-      let!(:item_1_content) { ":[#{item_1.name}](:#{item_1.id})"}
-      let!(:item_2_content) { ":[#{item_2.name}](:#{item_2.id})"}
-      let!(:item_3_content) { ":[#{item_3.name}](:#{item_3.id})"}
+      let!(:item_1_content) { ":[#{item_1.name}](:#{item_1.id})" }
+      let!(:item_2_content) { ":[#{item_2.name}](:#{item_2.id})" }
+      let!(:item_3_content) { ":[#{item_3.name}](:#{item_3.id})" }
 
       it 'correctly links to multiple items' do
         note.update(content: "This is a note for #{item_1_content} and (#{item_2_content})")
@@ -247,9 +247,9 @@ RSpec.describe Note, type: :model do
       let!(:location_2) { FactoryBot.create(:notable, :location, notebook: notebook) }
       let!(:location_3) { FactoryBot.create(:notable, :location, notebook: notebook_2) }
 
-      let!(:location_1_content) { "#[#{location_1.name}](##{location_1.id})"}
-      let!(:location_2_content) { "#[#{location_2.name}](##{location_2.id})"}
-      let!(:location_3_content) { "#[#{location_3.name}](##{location_3.id})"}
+      let!(:location_1_content) { "#[#{location_1.name}](##{location_1.id})" }
+      let!(:location_2_content) { "#[#{location_2.name}](##{location_2.id})" }
+      let!(:location_3_content) { "#[#{location_3.name}](##{location_3.id})" }
 
       it 'correctly links to multiple locations' do
         note.update(content: "This is a note for #{location_1_content} and (#{location_2_content})")
@@ -282,9 +282,9 @@ RSpec.describe Note, type: :model do
       let!(:item) { FactoryBot.create(:notable, :item, notebook: notebook) }
       let!(:location) { FactoryBot.create(:notable, :location, notebook: notebook) }
 
-      let!(:character_content) { "@[#{character.name}](@#{character.id})"}
-      let!(:item_content) { ":[#{item.name}](:#{item.id})"}
-      let!(:location_content) { "#[#{location.name}](##{location.id})"}
+      let!(:character_content) { "@[#{character.name}](@#{character.id})" }
+      let!(:item_content) { ":[#{item.name}](:#{item.id})" }
+      let!(:location_content) { "#[#{location.name}](##{location.id})" }
 
       it 'is successfully linked to all notables' do
         note.update(content: "This is a note for #{character_content}, who visited #{location_content} and recovered #{item_content}")
@@ -306,9 +306,9 @@ RSpec.describe Note, type: :model do
       let!(:item) { FactoryBot.create(:notable, :item, notebook: notebook) }
       let!(:location) { FactoryBot.create(:notable, :location, notebook: notebook) }
 
-      let!(:character_content) { "@[#{character.name}](@#{character.id})"}
-      let!(:item_content) { ":[#{item.name}](:#{item.id})"}
-      let!(:location_content) { "#[#{location.name}](##{location.id})"}
+      let!(:character_content) { "@[#{character.name}](@#{character.id})" }
+      let!(:item_content) { ":[#{item.name}](:#{item.id})" }
+      let!(:location_content) { "#[#{location.name}](##{location.id})" }
 
       it 'is successfully removes links to unused notables' do
         note.update(content: "This is a note for #{character_content}")
