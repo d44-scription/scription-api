@@ -16,11 +16,11 @@ class Note < ApplicationRecord
   private
 
   def regex_for(trigger)
-    /#{trigger}\[[^#{trigger}]*\]\(#{trigger}\d+\)/
+    /#{trigger}\[[^\]]+\]\(#{trigger}\d+\)/
   end
 
   def trim_for_id(code, trigger)
-    code.gsub(/#{trigger}\[[^#{trigger}]*\]\(#{trigger}/, '').delete(')')
+    code.gsub(/#{trigger}\[[^\]]+\]\(#{trigger}/, '').delete(')')
   end
 
   def link_notables
@@ -41,8 +41,8 @@ class Note < ApplicationRecord
         stripped_content.scan(regex_for(trigger)).map { |code| stripped_content.slice!(code) }
       end
 
-      if Notable::TRIGGERS.any? { |trigger| stripped_content.include?(trigger) }
-        errors.add(:content, 'cannot include trigger characters outside of use')
+      if ["[", "]"].any? { |trigger| stripped_content.include?(trigger) }
+        errors.add(:content, 'cannot include square bracket characters')
       end
     end
   end
