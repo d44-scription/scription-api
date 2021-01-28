@@ -10,7 +10,6 @@ class Notable < ApplicationRecord
   validates :name, presence: true
 
   TYPES = %w[Item Character Location].freeze
-  TRIGGERS = [::Item::TRIGGER, ::Character::TRIGGER, ::Location::TRIGGER]
 
   private
 

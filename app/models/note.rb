@@ -9,6 +9,8 @@ class Note < ApplicationRecord
   validate :link_notables
   validate :forbidden_characters
 
+  TRIGGERS = [Item::TRIGGER, Character::TRIGGER, Location::TRIGGER]
+
   def notable_message
     notables.any? ? "Note linked to: #{notables.pluck(:name).join('/')}" : 'Note linked to no notables'
   end
@@ -37,7 +39,7 @@ class Note < ApplicationRecord
     if content
       stripped_content = content.dup
 
-      Notable::TRIGGERS.each do |trigger|
+      TRIGGERS.each do |trigger|
         stripped_content.scan(regex_for(trigger)).map { |code| stripped_content.slice!(code) }
       end
 
