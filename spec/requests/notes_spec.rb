@@ -8,6 +8,7 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
 
   let!(:note_1) { FactoryBot.create(:note, notebook: notebook_1, content: 'Note 1') }
   let!(:note_2) { FactoryBot.create(:note, notebook: notebook_2, content: 'Note 2') }
+  let!(:note_3) { FactoryBot.create(:note, notebook: notebook_1, content: 'Note 3') }
 
   let(:valid_attributes) { FactoryBot.attributes_for(:note, notebook: notebook_1, content: 'New Note') }
   let(:invalid_attributes) { FactoryBot.attributes_for(:note, content: nil) }
@@ -26,6 +27,11 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
 
       expect(response).to be_successful
       expect(response.body).to include(note_1.content)
+      expect(response.body).to include(note_1.order_index.to_s)
+
+      expect(response.body).to include(note_3.content)
+      expect(response.body).to include(note_3.order_index.to_s)
+
       expect(response.body).not_to include(note_2.content)
       expect(response.body).not_to include(valid_attributes[:content])
     end
@@ -39,6 +45,7 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
       expect(response.body).to include(note_1.content)
       expect(response.body).to include('Note linked to no notables')
       expect(response.body).not_to include(note_2.content)
+      expect(response.body).not_to include(note_3.content)
       expect(response.body).not_to include(valid_attributes[:content])
     end
   end
@@ -61,6 +68,7 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
 
         expect(response.body).not_to include(note_1.content)
         expect(response.body).not_to include(note_2.content)
+        expect(response.body).not_to include(note_3.content)
         expect(response.body).to include(valid_attributes[:content])
         expect(response.body).to include('Note linked to no notables')
       end
@@ -86,6 +94,7 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
 
         expect(response.body).not_to include(note_1.content)
         expect(response.body).not_to include(note_2.content)
+        expect(response.body).not_to include(note_3.content)
         expect(response.body).to include(notable_attributes[:content])
         expect(response.body).to include("Note linked to: #{notable.name}")
 
@@ -184,6 +193,7 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
 
         expect(response.body).not_to include(note_1.content)
         expect(response.body).not_to include(note_2.content)
+        expect(response.body).not_to include(note_3.content)
         expect(response.body).to include(new_attributes[:content])
         expect(response.body).to include("Note linked to: #{notable.name}")
 

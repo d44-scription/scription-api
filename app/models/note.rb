@@ -8,6 +8,9 @@ class Note < ApplicationRecord
   validates :content, presence: true, length: { in: 5..500 }
   validate :link_notables
   validate :forbidden_characters
+  validates :order_index, presence: true, uniqueness: { scope: :notebook }
+
+  before_validation(on: :create) { set_order_index }
 
   TRIGGERS = [Item::TRIGGER, Character::TRIGGER, Location::TRIGGER]
 
@@ -16,6 +19,10 @@ class Note < ApplicationRecord
   end
 
   private
+
+  def set_order_index
+    self.order_index = notebook ? (notebook.notes.pluck(:order_index).max || -1) + 1 : nil
+  end
 
   def regex_for(trigger)
     /#{trigger}\[[^\]]+\]\(#{trigger}\d+\)/

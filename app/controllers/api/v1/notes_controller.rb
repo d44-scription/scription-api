@@ -7,7 +7,7 @@ module Api
       before_action :fetch_note, only: %i[show update destroy]
 
       def index
-        @notes = @notebook.notes
+        @notes = @notebook.notes.order(:order_index)
       end
 
       def create
