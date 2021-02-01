@@ -17,7 +17,6 @@ class Notable < ApplicationRecord
   private
 
   def set_order_index
-    # TODO: Once users are added, ensure this retrieves order index from within user scoped
     self.order_index = notebook ? (notebook.notables.pluck(:order_index).max || -1) + 1 : nil
   end
 
