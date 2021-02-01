@@ -7,7 +7,8 @@ RSpec.describe '/api/v1/notebooks/:id/characters', type: :request do
   let!(:notebook_2) { FactoryBot.create(:notebook) }
 
   let!(:character_1) { FactoryBot.create(:notable, :character, notebook: notebook_1, name: 'Character 1') }
-  let!(:character_2) { FactoryBot.create(:notable, :character, notebook: notebook_2, name: 'Character 2') }
+  let!(:character_2) { FactoryBot.create(:notable, :character, notebook: notebook_1, name: 'Character 2') }
+  let!(:character_3) { FactoryBot.create(:notable, :character, notebook: notebook_2, name: 'Character 3') }
   let!(:item) { FactoryBot.create(:notable, :item, notebook: notebook_1, name: 'Item') }
   let!(:location) { FactoryBot.create(:notable, :location, notebook: notebook_1, name: 'Location') }
 
@@ -25,25 +26,41 @@ RSpec.describe '/api/v1/notebooks/:id/characters', type: :request do
 
       expect(response).to be_successful
       expect(response.body).to include(character_1.name)
+      expect(response.body).to include(character_2.name)
 
-      expect(response.body).not_to include(character_2.name)
+      expect(response.body).not_to include(character_3.name)
       expect(response.body).not_to include(item.name)
       expect(response.body).not_to include(location.name)
     end
 
+    it 'correctly sorts characters by order index' do
+      character_1.update(order_index: 50)
+
+      get api_v1_notebook_characters_url(notebook_1), headers: valid_headers, as: :json
+
+      expect(response).to be_successful
+      expect(response.body).to include(character_1.name)
+      expect(response.body).to include(character_2.name)
+
+      json = JSON.parse(response.body)
+
+      expect(json.first['name']).to eql(character_2.name)
+      expect(json.second['name']).to eql(character_1.name)
+    end
+
     describe 'when searching' do
-      let!(:character_3) { FactoryBot.create(:notable, :character, notebook: notebook_1, name: 'Different Character') }
-      let!(:character_4) { FactoryBot.create(:notable, :character, notebook: notebook_1, name: 'Another Character') }
+      let!(:character_4) { FactoryBot.create(:notable, :character, notebook: notebook_1, name: 'Different Character') }
+      let!(:character_5) { FactoryBot.create(:notable, :character, notebook: notebook_1, name: 'Another Character') }
 
       it 'returns a subset of characters matching the search query' do
         get api_v1_notebook_characters_url(notebook_1, q: 'Different'), headers: valid_headers, as: :json
 
         expect(response).to be_successful
         expect(response.body).not_to include(character_1.name)
-        expect(response.body).to include(character_3.name)
-        expect(response.body).not_to include(character_4.name)
+        expect(response.body).to include(character_4.name)
+        expect(response.body).not_to include(character_5.name)
 
-        expect(response.body).not_to include(character_2.name)
+        expect(response.body).not_to include(character_3.name)
         expect(response.body).not_to include(item.name)
         expect(response.body).not_to include(location.name)
       end
@@ -53,10 +70,10 @@ RSpec.describe '/api/v1/notebooks/:id/characters', type: :request do
 
         expect(response).to be_successful
         expect(response.body).not_to include(character_1.name)
-        expect(response.body).not_to include(character_3.name)
         expect(response.body).not_to include(character_4.name)
+        expect(response.body).not_to include(character_5.name)
 
-        expect(response.body).not_to include(character_2.name)
+        expect(response.body).not_to include(character_3.name)
         expect(response.body).not_to include(item.name)
         expect(response.body).not_to include(location.name)
       end
@@ -66,10 +83,10 @@ RSpec.describe '/api/v1/notebooks/:id/characters', type: :request do
 
         expect(response).to be_successful
         expect(response.body).to include(character_1.name)
-        expect(response.body).to include(character_3.name)
         expect(response.body).to include(character_4.name)
+        expect(response.body).to include(character_5.name)
 
-        expect(response.body).not_to include(character_2.name)
+        expect(response.body).not_to include(character_3.name)
         expect(response.body).not_to include(item.name)
         expect(response.body).not_to include(location.name)
       end
@@ -79,10 +96,10 @@ RSpec.describe '/api/v1/notebooks/:id/characters', type: :request do
 
         expect(response).to be_successful
         expect(response.body).not_to include(character_1.name)
-        expect(response.body).not_to include(character_3.name)
-        expect(response.body).to include(character_4.name)
+        expect(response.body).not_to include(character_4.name)
+        expect(response.body).to include(character_5.name)
 
-        expect(response.body).not_to include(character_2.name)
+        expect(response.body).not_to include(character_3.name)
         expect(response.body).not_to include(item.name)
         expect(response.body).not_to include(location.name)
       end
