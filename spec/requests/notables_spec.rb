@@ -69,6 +69,21 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
       expect(response.body).not_to include(character_attributes[:name])
       expect(response.body).not_to include(location_attributes[:name])
     end
+
+    it 'retrieves notes in correct order' do
+      note_1.update(order_index: 50)
+
+      get notes_api_v1_notebook_notable_path(notebook_1, item), headers: valid_headers, as: :json
+
+      expect(response).to be_successful
+      expect(response.body).to include(note_1.content)
+      expect(response.body).to include(note_2.content)
+
+      json = JSON.parse(response.body)
+
+      expect(json.first['content']).to eql(note_2.content)
+      expect(json.second['content']).to eql(note_1.content)
+    end
   end
 
   describe 'GET /show' do
