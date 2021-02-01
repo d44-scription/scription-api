@@ -4,15 +4,16 @@ class Note < ApplicationRecord
   belongs_to :notebook
   has_and_belongs_to_many :notables
 
+  TRIGGERS = [Item::TRIGGER, Character::TRIGGER, Location::TRIGGER]
+  CHARACTER_LIMIT = 1000
+
   validates :notebook, presence: true
-  validates :content, presence: true, length: { in: 5..500 }
+  validates :content, presence: true, length: { in: 5..CHARACTER_LIMIT }
   validate :link_notables
   validate :forbidden_characters
   validates :order_index, presence: true, uniqueness: { scope: :notebook }
 
   before_validation(on: :create) { set_order_index }
-
-  TRIGGERS = [Item::TRIGGER, Character::TRIGGER, Location::TRIGGER]
 
   def notable_message
     notables.any? ? "Note linked to: #{notables.pluck(:name).join('/')}" : 'Note linked to no notables'
