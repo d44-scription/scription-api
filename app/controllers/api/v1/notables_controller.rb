@@ -7,7 +7,7 @@ module Api
       before_action :fetch_notable, only: %i[notes show update destroy]
 
       def index
-        @notables = @notebook.notables.order(:type)
+        @notables = @notebook.notables.order(:order_index)
       end
 
       def notes
