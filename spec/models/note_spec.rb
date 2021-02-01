@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe Note, type: :model do
   let!(:notebook) { FactoryBot.create(:notebook) }
-  let!(:note) { FactoryBot.build(:note, notebook: notebook) }
+  let!(:note) { FactoryBot.build(:note, notebook: notebook, content: '1' * Note::CHARACTER_LIMIT) }
 
   it 'is valid when attributes are correct' do
     expect(note).to have(0).errors_on(:content)
@@ -44,12 +44,12 @@ RSpec.describe Note, type: :model do
   end
 
   it 'is not valid when content is too long' do
-    note.content = '1' * 501
+    note.content = '1' * (Note::CHARACTER_LIMIT + 1)
 
     expect(note).to have(1).errors_on(:content)
     expect(note).to have(0).errors_on(:notebook)
 
-    expect(note.errors.full_messages).to contain_exactly('Content is too long (maximum is 500 characters)')
+    expect(note.errors.full_messages).to contain_exactly("Content is too long (maximum is #{Note::CHARACTER_LIMIT} characters)")
     expect(note).not_to be_valid
   end
 
