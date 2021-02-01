@@ -8,9 +8,7 @@ class Notable < ApplicationRecord
   validates :type, presence: true
   validates :notebook, presence: true
   validates :name, presence: true
-
-  # TODO: Once users are added, ensure this is unique within the scope of each user
-  validates :order_index, presence: true, uniqueness: true
+  validates :order_index, presence: true, uniqueness: { scope: :notebook }
 
   before_validation(on: :create) { set_order_index }
 

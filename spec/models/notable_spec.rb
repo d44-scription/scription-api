@@ -62,7 +62,7 @@ RSpec.describe Notable, type: :model do
       expect(item).not_to be_valid
     end
 
-    it 'correctly sets order index when no other notebooks are available' do
+    it 'correctly sets order index when no other items are in this notebook' do
       expect(item.order_index).to be_nil
 
       item.save
@@ -82,6 +82,23 @@ RSpec.describe Notable, type: :model do
       expect(item).to have(0).errors_on(:order_index)
       expect(item.order_index).to eql(1)
       expect(item_2.order_index).to eql(0)
+      expect(item).to be_valid
+    end
+
+    it 'correctly sets order index in sequence when different notable types present' do
+      location = FactoryBot.create(:notable, :location, notebook: notebook)
+      character = FactoryBot.create(:notable, :character, notebook: notebook)
+
+      expect(item.order_index).to be_nil
+      expect(location.order_index).to eql(0)
+      expect(character.order_index).to eql(1)
+
+      item.save
+
+      expect(item).to have(0).errors_on(:order_index)
+      expect(item.order_index).to eql(2)
+      expect(location.order_index).to eql(0)
+      expect(character.order_index).to eql(1)
       expect(item).to be_valid
     end
   end
