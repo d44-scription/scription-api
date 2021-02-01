@@ -8,10 +8,18 @@ class Notable < ApplicationRecord
   validates :type, presence: true
   validates :notebook, presence: true
   validates :name, presence: true
+  validates :order_index, presence: true, uniqueness: { scope: :notebook }
+
+  before_validation(on: :create) { set_order_index }
 
   TYPES = %w[Item Character Location].freeze
 
   private
+
+  def set_order_index
+    # TODO: Once users are added, ensure this retrieves order index from within user scoped
+    self.order_index = notebook ? (notebook.notables.pluck(:order_index).max || -1) + 1 : nil
+  end
 
   def permitted_type
     errors.add(:type, "must be one of #{TYPES.join('/')}") unless TYPES.include?(type)

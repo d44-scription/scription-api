@@ -32,8 +32,11 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
 
       expect(response).to be_successful
       expect(response.body).to include(item.name)
+      expect(response.body).to include(item.order_index.to_s)
       expect(response.body).to include(character.name)
+      expect(response.body).to include(character.order_index.to_s)
       expect(response.body).to include(location.name)
+      expect(response.body).to include(location.order_index.to_s)
 
       expect(response.body).to include('type')
 
