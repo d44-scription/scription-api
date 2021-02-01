@@ -29,7 +29,7 @@ RSpec.describe Note, type: :model do
     expect(note).to have(0).errors_on(:content)
     expect(note).to have(2).errors_on(:notebook)
 
-    expect(note.errors.full_messages).to contain_exactly('Notebook must exist', 'Notebook can\'t be blank')
+    expect(note.errors.full_messages).to contain_exactly('Notebook must exist', 'Notebook can\'t be blank', 'Order index can\'t be blank')
     expect(note).not_to be_valid
   end
 
@@ -163,6 +163,29 @@ RSpec.describe Note, type: :model do
       expect(note.errors.full_messages).to contain_exactly('Content cannot include square bracket characters')
       expect(note).not_to be_valid
       expect(note.content).to eql(content)
+    end
+
+    it 'correctly sets order index when no other notes are in this notebook' do
+      expect(note.order_index).to be_nil
+
+      note.save
+
+      expect(note).to have(0).errors_on(:order_index)
+      expect(note.order_index).to eql(0)
+      expect(note).to be_valid
+    end
+
+    it 'correctly sets order index in sequence' do
+      note_2 = FactoryBot.create(:note, notebook: notebook)
+      expect(note.order_index).to be_nil
+      expect(note_2.order_index).to eql(0)
+
+      note.save
+
+      expect(note).to have(0).errors_on(:order_index)
+      expect(note.order_index).to eql(1)
+      expect(note_2.order_index).to eql(0)
+      expect(note).to be_valid
     end
   end
 
