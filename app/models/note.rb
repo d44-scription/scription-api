@@ -4,7 +4,7 @@ class Note < ApplicationRecord
   belongs_to :notebook
   has_and_belongs_to_many :notables
 
-  TRIGGERS = [Item::TRIGGER, Character::TRIGGER, Location::TRIGGER]
+  TRIGGERS = [Item::TRIGGER, Character::TRIGGER, Location::TRIGGER].freeze
   CHARACTER_LIMIT = 1000
 
   validates :notebook, presence: true
@@ -34,25 +34,25 @@ class Note < ApplicationRecord
   end
 
   def link_notables
+    return unless content
+
     notables.destroy_all
 
-    if content
-      link_characters if content.match(regex_for(Character::TRIGGER))
-      link_items if content.match(regex_for(Item::TRIGGER))
-      link_locations if content.match(regex_for(Location::TRIGGER))
-    end
+    link_characters if content.match(regex_for(Character::TRIGGER))
+    link_items if content.match(regex_for(Item::TRIGGER))
+    link_locations if content.match(regex_for(Location::TRIGGER))
   end
 
   def forbidden_characters
-    if content
-      stripped_content = content.dup
+    return unless content
 
-      TRIGGERS.each do |trigger|
-        stripped_content.scan(regex_for(trigger)).map { |code| stripped_content.slice!(code) }
-      end
+    stripped_content = content.dup
 
-      errors.add(:content, 'cannot include square bracket characters') if ['[', ']'].any? { |trigger| stripped_content.include?(trigger) }
+    TRIGGERS.each do |trigger|
+      stripped_content.scan(regex_for(trigger)).map { |code| stripped_content.slice!(code) }
     end
+
+    errors.add(:content, 'cannot include square bracket characters') if ['[', ']'].any? { |trigger| stripped_content.include?(trigger) }
   end
 
   def link_characters
