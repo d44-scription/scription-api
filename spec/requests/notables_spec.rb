@@ -5,18 +5,18 @@ require 'rails_helper'
 RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
   let!(:notebook_1) { FactoryBot.create(:notebook) }
 
-  let!(:item) { FactoryBot.create(:notable, :item, notebook: notebook_1, name: 'Item') }
-  let!(:character) { FactoryBot.create(:notable, :item, notebook: notebook_1, name: 'Character') }
-  let!(:location) { FactoryBot.create(:notable, :item, notebook: notebook_1, name: 'Location') }
+  let!(:item) { FactoryBot.create(:item, notebook: notebook_1, name: 'Item') }
+  let!(:character) { FactoryBot.create(:item, notebook: notebook_1, name: 'Character') }
+  let!(:location) { FactoryBot.create(:item, notebook: notebook_1, name: 'Location') }
 
-  let(:item_attributes) { FactoryBot.attributes_for(:notable, :item, notebook: notebook_1) }
-  let(:character_attributes) { FactoryBot.attributes_for(:notable, :character, notebook: notebook_1) }
-  let(:location_attributes) { FactoryBot.attributes_for(:notable, :location, notebook: notebook_1) }
+  let(:item_attributes) { FactoryBot.attributes_for(:item, notebook: notebook_1) }
+  let(:character_attributes) { FactoryBot.attributes_for(:character, notebook: notebook_1) }
+  let(:location_attributes) { FactoryBot.attributes_for(:location, notebook: notebook_1) }
 
   let!(:invalid_notebook) { FactoryBot.create(:notebook) }
-  let!(:invalid_item) { FactoryBot.create(:notable, :item, notebook: invalid_notebook, name: 'Other Item') }
+  let!(:invalid_item) { FactoryBot.create(:item, notebook: invalid_notebook, name: 'Other Item') }
 
-  let(:invalid_attributes) { FactoryBot.attributes_for(:notable, :item, type: nil) }
+  let(:invalid_attributes) { FactoryBot.attributes_for(:item, type: nil) }
 
   # This should return the minimal set of values that should be in the headers
   # in order to pass any filters (e.g. authentication) defined in
@@ -167,7 +167,7 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
 
   describe 'PATCH /update' do
     context 'with valid parameters' do
-      let(:new_attributes) { FactoryBot.attributes_for(:notable, :item, name: 'Updated Item') }
+      let(:new_attributes) { FactoryBot.attributes_for(:item, name: 'Updated Item') }
 
       it 'updates the requested item' do
         expect do

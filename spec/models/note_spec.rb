@@ -57,14 +57,14 @@ RSpec.describe Note, type: :model do
     let!(:notebook_2) { FactoryBot.create(:notebook) }
 
     # Confirm regex matches id's longer than 1 character
-    let!(:character_1) { FactoryBot.create(:notable, :character, id: 150, notebook: notebook) }
-    let!(:character_2) { FactoryBot.create(:notable, :character, notebook: notebook_2) }
+    let!(:character_1) { FactoryBot.create(:character, id: 150, notebook: notebook) }
+    let!(:character_2) { FactoryBot.create(:character, notebook: notebook_2) }
 
-    let!(:item_1) { FactoryBot.create(:notable, :item, notebook: notebook) }
-    let!(:item_2) { FactoryBot.create(:notable, :item, notebook: notebook_2) }
+    let!(:item_1) { FactoryBot.create(:item, notebook: notebook) }
+    let!(:item_2) { FactoryBot.create(:item, notebook: notebook_2) }
 
-    let!(:location_1) { FactoryBot.create(:notable, :location, notebook: notebook) }
-    let!(:location_2) { FactoryBot.create(:notable, :location, notebook: notebook_2) }
+    let!(:location_1) { FactoryBot.create(:location, notebook: notebook) }
+    let!(:location_2) { FactoryBot.create(:location, notebook: notebook_2) }
 
     it 'is valid when notables are from same notebook' do
       note.content = "@[#{character_1.name}](@#{character_1.id}):[#{item_1.name}](:#{item_1.id})#[#{location_1.name}](##{location_1.id})"
@@ -194,9 +194,9 @@ RSpec.describe Note, type: :model do
 
     describe 'when linking characters' do
       # Confirm regex matches id's longer than 1 character
-      let!(:character_1) { FactoryBot.create(:notable, :character, id: 150, notebook: notebook) }
-      let!(:character_2) { FactoryBot.create(:notable, :character, notebook: notebook) }
-      let!(:character_3) { FactoryBot.create(:notable, :character, notebook: notebook_2) }
+      let!(:character_1) { FactoryBot.create(:character, id: 150, notebook: notebook) }
+      let!(:character_2) { FactoryBot.create(:character, notebook: notebook) }
+      let!(:character_3) { FactoryBot.create(:character, notebook: notebook_2) }
 
       let!(:character_1_content) { "@[#{character_1.name}](@#{character_1.id})" }
       let!(:character_2_content) { "@[#{character_2.name}](@#{character_2.id})" }
@@ -230,9 +230,9 @@ RSpec.describe Note, type: :model do
 
     describe 'when linking items' do
       # Confirm regex matches id's longer than 1 character
-      let!(:item_1) { FactoryBot.create(:notable, :item, id: 150, notebook: notebook) }
-      let!(:item_2) { FactoryBot.create(:notable, :item, notebook: notebook) }
-      let!(:item_3) { FactoryBot.create(:notable, :item, notebook: notebook_2) }
+      let!(:item_1) { FactoryBot.create(:item, id: 150, notebook: notebook) }
+      let!(:item_2) { FactoryBot.create(:item, notebook: notebook) }
+      let!(:item_3) { FactoryBot.create(:item, notebook: notebook_2) }
 
       let!(:item_1_content) { ":[#{item_1.name}](:#{item_1.id})" }
       let!(:item_2_content) { ":[#{item_2.name}](:#{item_2.id})" }
@@ -266,9 +266,9 @@ RSpec.describe Note, type: :model do
 
     describe 'when linking locations' do
       # Confirm regex matches id's longer than 1 character
-      let!(:location_1) { FactoryBot.create(:notable, :location, id: 150, notebook: notebook) }
-      let!(:location_2) { FactoryBot.create(:notable, :location, notebook: notebook) }
-      let!(:location_3) { FactoryBot.create(:notable, :location, notebook: notebook_2) }
+      let!(:location_1) { FactoryBot.create(:location, id: 150, notebook: notebook) }
+      let!(:location_2) { FactoryBot.create(:location, notebook: notebook) }
+      let!(:location_3) { FactoryBot.create(:location, notebook: notebook_2) }
 
       let!(:location_1_content) { "#[#{location_1.name}](##{location_1.id})" }
       let!(:location_2_content) { "#[#{location_2.name}](##{location_2.id})" }
@@ -301,9 +301,9 @@ RSpec.describe Note, type: :model do
     end
 
     describe 'when linking multiple types of notable' do
-      let!(:character) { FactoryBot.create(:notable, :character, id: 150, notebook: notebook) }
-      let!(:item) { FactoryBot.create(:notable, :item, notebook: notebook) }
-      let!(:location) { FactoryBot.create(:notable, :location, notebook: notebook) }
+      let!(:character) { FactoryBot.create(:character, id: 150, notebook: notebook) }
+      let!(:item) { FactoryBot.create(:item, notebook: notebook) }
+      let!(:location) { FactoryBot.create(:location, notebook: notebook) }
 
       let!(:character_content) { "@[#{character.name}](@#{character.id})" }
       let!(:item_content) { ":[#{item.name}](:#{item.id})" }
@@ -325,9 +325,9 @@ RSpec.describe Note, type: :model do
     end
 
     describe 'when changing contents to remove links' do
-      let!(:character) { FactoryBot.create(:notable, :character, notebook: notebook) }
-      let!(:item) { FactoryBot.create(:notable, :item, notebook: notebook) }
-      let!(:location) { FactoryBot.create(:notable, :location, notebook: notebook) }
+      let!(:character) { FactoryBot.create(:character, notebook: notebook) }
+      let!(:item) { FactoryBot.create(:item, notebook: notebook) }
+      let!(:location) { FactoryBot.create(:location, notebook: notebook) }
 
       let!(:character_content) { "@[#{character.name}](@#{character.id})" }
       let!(:item_content) { ":[#{item.name}](:#{item.id})" }

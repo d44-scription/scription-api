@@ -14,6 +14,10 @@ class Notable < ApplicationRecord
 
   TYPES = %w[Item Character Location].freeze
 
+  def text_code
+    raise 'This should be overriden by subclasses'
+  end
+
   private
 
   def set_order_index

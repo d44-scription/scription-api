@@ -6,11 +6,11 @@ RSpec.describe '/api/v1/notebooks/:id/items', type: :request do
   let!(:notebook_1) { FactoryBot.create(:notebook) }
   let!(:notebook_2) { FactoryBot.create(:notebook) }
 
-  let!(:item_1) { FactoryBot.create(:notable, :item, notebook: notebook_1, name: 'Item 1') }
-  let!(:item_2) { FactoryBot.create(:notable, :item, notebook: notebook_1, name: 'Item 2') }
-  let!(:item_3) { FactoryBot.create(:notable, :item, notebook: notebook_2, name: 'Item 3') }
-  let!(:character) { FactoryBot.create(:notable, :character, notebook: notebook_1, name: 'Character') }
-  let!(:location) { FactoryBot.create(:notable, :location, notebook: notebook_1, name: 'Location') }
+  let!(:item_1) { FactoryBot.create(:item, notebook: notebook_1, name: 'Item 1') }
+  let!(:item_2) { FactoryBot.create(:item, notebook: notebook_1, name: 'Item 2') }
+  let!(:item_3) { FactoryBot.create(:item, notebook: notebook_2, name: 'Item 3') }
+  let!(:character) { FactoryBot.create(:character, notebook: notebook_1, name: 'Character') }
+  let!(:location) { FactoryBot.create(:location, notebook: notebook_1, name: 'Location') }
 
   # This should return the minimal set of values that should be in the headers
   # in order to pass any filters (e.g. authentication) defined in
@@ -26,6 +26,10 @@ RSpec.describe '/api/v1/notebooks/:id/items', type: :request do
 
       expect(response).to be_successful
       expect(response.body).to include(item_1.name)
+      expect(response.body).to include(item_1.text_code)
+
+      expect(response.body).to include(item_2.name)
+      expect(response.body).to include(item_2.text_code)
 
       expect(response.body).not_to include(item_3.name)
       expect(response.body).not_to include(character.name)
@@ -48,8 +52,8 @@ RSpec.describe '/api/v1/notebooks/:id/items', type: :request do
     end
 
     describe 'when searching' do
-      let!(:item_4) { FactoryBot.create(:notable, :item, notebook: notebook_1, name: 'Different Item') }
-      let!(:item_5) { FactoryBot.create(:notable, :item, notebook: notebook_1, name: 'Another Item') }
+      let!(:item_4) { FactoryBot.create(:item, notebook: notebook_1, name: 'Different Item') }
+      let!(:item_5) { FactoryBot.create(:item, notebook: notebook_1, name: 'Another Item') }
 
       it 'returns a subset of items matching the search query' do
         get api_v1_notebook_items_url(notebook_1, q: 'Different'), headers: valid_headers, as: :json

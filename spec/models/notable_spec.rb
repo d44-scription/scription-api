@@ -25,7 +25,7 @@ RSpec.describe Notable, type: :model do
   end
 
   context 'when an item' do
-    let!(:item) { FactoryBot.build(:notable, :item, notebook: notebook) }
+    let!(:item) { FactoryBot.build(:item, notebook: notebook) }
 
     it 'is valid when attributes are correct' do
       expect(notebook.items).to be_empty
@@ -73,7 +73,7 @@ RSpec.describe Notable, type: :model do
     end
 
     it 'correctly sets order index in sequence' do
-      item_2 = FactoryBot.create(:notable, :item, notebook: notebook)
+      item_2 = FactoryBot.create(:item, notebook: notebook)
       expect(item.order_index).to be_nil
       expect(item_2.order_index).to eql(0)
 
@@ -86,8 +86,8 @@ RSpec.describe Notable, type: :model do
     end
 
     it 'correctly sets order index in sequence when different notable types present' do
-      location = FactoryBot.create(:notable, :location, notebook: notebook)
-      character = FactoryBot.create(:notable, :character, notebook: notebook)
+      location = FactoryBot.create(:location, notebook: notebook)
+      character = FactoryBot.create(:character, notebook: notebook)
 
       expect(item.order_index).to be_nil
       expect(location.order_index).to eql(0)
@@ -101,10 +101,16 @@ RSpec.describe Notable, type: :model do
       expect(character.order_index).to eql(1)
       expect(item).to be_valid
     end
+
+    it 'returns text code with item trigger' do
+      item.save
+
+      expect(item.text_code).to eql(":[#{item.name}](:#{item.id})")
+    end
   end
 
   context 'when a character' do
-    let!(:character) { FactoryBot.build(:notable, :character, notebook: notebook) }
+    let!(:character) { FactoryBot.build(:character, notebook: notebook) }
 
     it 'is valid when attributes are correct' do
       expect(notebook.characters).to be_empty
@@ -118,10 +124,16 @@ RSpec.describe Notable, type: :model do
       character.save
       expect(notebook.characters).not_to be_empty
     end
+
+    it 'returns text code with character trigger' do
+      character.save
+
+      expect(character.text_code).to eql("@[#{character.name}](@#{character.id})")
+    end
   end
 
   context 'when a location' do
-    let!(:location) { FactoryBot.build(:notable, :location, notebook: notebook) }
+    let!(:location) { FactoryBot.build(:location, notebook: notebook) }
 
     it 'is valid when attributes are correct' do
       expect(notebook.locations).to be_empty
@@ -134,6 +146,12 @@ RSpec.describe Notable, type: :model do
 
       location.save
       expect(notebook.locations).not_to be_empty
+    end
+
+    it 'returns text code with location trigger' do
+      location.save
+
+      expect(location.text_code).to eql("#[#{location.name}](##{location.id})")
     end
   end
 end
