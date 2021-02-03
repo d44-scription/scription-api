@@ -90,7 +90,7 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
     end
 
     context 'with a link to a notable' do
-      let(:notable) { FactoryBot.create(:notable, :character, notebook: notebook_1) }
+      let(:notable) { FactoryBot.create(:character, notebook: notebook_1) }
       let(:notable_attributes) { FactoryBot.attributes_for(:note, notebook: notebook_1, content: "@[#{notable.name}](@#{notable.id})") }
 
       it 'creates a new Note' do
@@ -119,7 +119,7 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
     end
 
     context 'with a link to an invalid notable' do
-      let(:notable) { FactoryBot.create(:notable, :character, notebook: notebook_2) }
+      let(:notable) { FactoryBot.create(:character, notebook: notebook_2) }
       let(:invalid_attributes) { FactoryBot.attributes_for(:note, notebook: notebook_1, content: "@[#{notable.name}](@#{notable.id})") }
 
       it 'renders a JSON response with errors for the note' do
@@ -185,7 +185,7 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
     end
 
     context 'with a link to a notable' do
-      let(:notable) { FactoryBot.create(:notable, :character, notebook: notebook_1) }
+      let(:notable) { FactoryBot.create(:character, notebook: notebook_1) }
       let(:new_attributes) { FactoryBot.attributes_for(:note, notebook: notebook_1, content: "@[#{notable.name}](@#{notable.id})") }
 
       it 'updates the requested note' do
@@ -217,7 +217,7 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
     end
 
     context 'with a link to an invalid notable' do
-      let(:notable) { FactoryBot.create(:notable, :character, notebook: notebook_2) }
+      let(:notable) { FactoryBot.create(:character, notebook: notebook_2) }
       let(:invalid_attributes) { FactoryBot.attributes_for(:note, notebook: notebook_1, content: "@[#{notable.name}](@#{notable.id})") }
 
       it 'renders a JSON response with errors for the note' do

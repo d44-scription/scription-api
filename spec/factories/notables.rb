@@ -6,15 +6,15 @@ FactoryBot.define do
     description { 'Description of notable' }
     notebook
 
-    trait :item do
+    factory :item, class: Item do
       type { 'Item' }
     end
 
-    trait :character do
+    factory :character, class: Character do
       type { 'Character' }
     end
 
-    trait :location do
+    factory :location, class: Location do
       type { 'Location' }
     end
   end
