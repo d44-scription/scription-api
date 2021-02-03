@@ -26,6 +26,10 @@ RSpec.describe '/api/v1/notebooks/:id/items', type: :request do
 
       expect(response).to be_successful
       expect(response.body).to include(item_1.name)
+      expect(response.body).to include(item_1.text_code)
+
+      expect(response.body).to include(item_2.name)
+      expect(response.body).to include(item_2.text_code)
 
       expect(response.body).not_to include(item_3.name)
       expect(response.body).not_to include(character.name)
