@@ -101,6 +101,12 @@ RSpec.describe Notable, type: :model do
       expect(character.order_index).to eql(1)
       expect(item).to be_valid
     end
+
+    it 'returns text code with item trigger' do
+      item.save
+
+      expect(item.text_code).to eql(":[#{item.name}](:#{item.id})")
+    end
   end
 
   context 'when a character' do
@@ -118,6 +124,12 @@ RSpec.describe Notable, type: :model do
       character.save
       expect(notebook.characters).not_to be_empty
     end
+
+    it 'returns text code with character trigger' do
+      character.save
+
+      expect(character.text_code).to eql("@[#{character.name}](@#{character.id})")
+    end
   end
 
   context 'when a location' do
@@ -134,6 +146,12 @@ RSpec.describe Notable, type: :model do
 
       location.save
       expect(notebook.locations).not_to be_empty
+    end
+
+    it 'returns text code with location trigger' do
+      location.save
+
+      expect(location.text_code).to eql("#[#{location.name}](##{location.id})")
     end
   end
 end
