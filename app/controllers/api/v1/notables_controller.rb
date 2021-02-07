@@ -11,7 +11,7 @@ module Api
       end
 
       def notes
-        @notes = @notable.notes.order(:order_index)
+        @notes = @notable.notes.order(:order_index).uniq
       end
 
       def create
