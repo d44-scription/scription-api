@@ -50,6 +50,7 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
   describe 'GET /notes' do
     let!(:note_1) { FactoryBot.create(:note, notebook: notebook_1, content: "Note 1 :[#{item.name}](:#{item.id})") }
     let!(:note_2) { FactoryBot.create(:note, notebook: notebook_1, content: "Note 2 :[#{item.name}](:#{item.id})") }
+    let!(:note_3) { FactoryBot.create(:note, notebook: notebook_1, content: "Note 3 :[#{item.name}](:#{item.id}) :[#{item.name}](:#{item.id}) :[#{item.name}](:#{item.id})") }
 
     it 'retrieves all notes for current notable' do
       get notes_api_v1_notebook_notable_path(notebook_1, item), headers: valid_headers, as: :json
@@ -57,6 +58,7 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
       expect(response).to be_successful
       expect(response.body).to include(note_1.content)
       expect(response.body).to include(note_2.content)
+      expect(response.body.scan(note_3.content)).to have_exactly(1).items
 
       expect(response.body).to include('success_message')
       expect(response.body).to include("Note linked to: #{item.name}")
@@ -82,7 +84,8 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
       json = JSON.parse(response.body)
 
       expect(json.first['content']).to eql(note_2.content)
-      expect(json.second['content']).to eql(note_1.content)
+      expect(json.second['content']).to eql(note_3.content)
+      expect(json.third['content']).to eql(note_1.content)
     end
   end
 
