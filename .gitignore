@@ -28,3 +28,5 @@
 
 # Ignore history of RSpec tests
 spec/examples.txt
+
+/config/credentials/development.key
