@@ -4,6 +4,8 @@ module Api
   module V1
     class NotebooksController < ApplicationController
       before_action :fetch_notebook, only: %i[show update destroy]
+
+      # TODO: This is for testing purposes and leaves an action unsecured
       skip_before_action :authorise_request, only: %i[index]
 
       def index
