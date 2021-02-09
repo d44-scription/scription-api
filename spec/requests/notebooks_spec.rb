@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe '/api/v1/notebooks', type: :request do
   let!(:user) { FactoryBot.create(:user) }
   let!(:existing_notebook) { FactoryBot.create(:notebook, user: user) }
+  let!(:existing_notebook_2) { FactoryBot.create(:notebook) }
 
   let(:valid_attributes) { FactoryBot.attributes_for(:notebook, user: user) }
   let(:invalid_attributes) { FactoryBot.attributes_for(:notebook, user: user, name: '0' * 46) }
@@ -25,7 +26,10 @@ RSpec.describe '/api/v1/notebooks', type: :request do
       expect(response.body).to include(existing_notebook.name)
       expect(response.body).to include(existing_notebook.summary)
       expect(response.body).to include(existing_notebook.order_index.to_s)
+
+      # Confirm response is scoped to current user & only includes created books
       expect(response.body).not_to include(valid_attributes[:name])
+      expect(response.body).not_to include(existing_notebook_2.name)
     end
   end
 
@@ -47,7 +51,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
         expect do
           post api_v1_notebooks_url,
                params: valid_attributes, headers: valid_headers, as: :json
-        end.to change(Notebook, :count).by(1)
+        end.to change(user.notebooks, :count).by(1)
       end
 
       it 'renders a JSON response with the new notebook' do
@@ -64,7 +68,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
         expect do
           post api_v1_notebooks_url,
                params: invalid_attributes, as: :json
-        end.to change(Notebook, :count).by(0)
+        end.to change(user.notebooks, :count).by(0)
       end
 
       it 'renders a JSON response with errors for the new notebook' do
@@ -120,7 +124,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
     it 'destroys the requested notebook' do
       expect do
         delete api_v1_notebook_url(existing_notebook), headers: valid_headers, as: :json
-      end.to change(Notebook, :count).by(-1)
+      end.to change(user.notebooks, :count).by(-1)
     end
   end
 end
