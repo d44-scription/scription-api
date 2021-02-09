@@ -19,6 +19,13 @@ RSpec.describe '/api/v1/notebooks', type: :request do
   end
 
   describe 'GET /index' do
+    it 'is prohibited when not signed in' do
+      get api_v1_notebooks_url, as: :json
+
+      expect(response).to be_unauthorized
+      expect(response.body).to include("Not Authenticated")
+    end
+
     it 'renders a successful response' do
       get api_v1_notebooks_url, headers: valid_headers, as: :json
 
@@ -36,6 +43,13 @@ RSpec.describe '/api/v1/notebooks', type: :request do
   describe 'GET /show' do
     let!(:note) { FactoryBot.create(:note, notebook: existing_notebook) }
 
+    it 'is prohibited when not signed in' do
+      get api_v1_notebook_url(existing_notebook), as: :json
+
+      expect(response).to be_unauthorized
+      expect(response.body).to include("Not Authenticated")
+    end
+
     it 'renders a successful response' do
       get api_v1_notebook_url(existing_notebook), headers: valid_headers, as: :json
 
@@ -47,6 +61,16 @@ RSpec.describe '/api/v1/notebooks', type: :request do
 
   describe 'POST /create' do
     context 'with valid parameters' do
+      it 'is prohibited when not signed in' do
+          expect do
+            post api_v1_notebooks_url,
+                params: valid_attributes, as: :json
+          end.to change(user.notebooks, :count).by(0)
+
+        expect(response).to be_unauthorized
+        expect(response.body).to include("Not Authenticated")
+      end
+
       it 'creates a new Notebook' do
         expect do
           post api_v1_notebooks_url,
@@ -87,9 +111,21 @@ RSpec.describe '/api/v1/notebooks', type: :request do
     context 'with valid parameters' do
       let(:new_attributes) { FactoryBot.attributes_for(:notebook, name: 'Updated Notebook', summary: 'Updated Summary') }
 
+      it 'is prohibited when not signed in' do
+        expect do
+          patch api_v1_notebook_url(existing_notebook),
+                params: new_attributes, as: :json
+        end.to change(Notebook, :count).by(0)
+
+        expect(response).to be_unauthorized
+        expect(response.body).to include("Not Authenticated")
+      end
+
       it 'updates the requested notebook' do
-        patch api_v1_notebook_url(existing_notebook),
-              params: new_attributes, headers: valid_headers, as: :json
+        expect do
+          patch api_v1_notebook_url(existing_notebook),
+                params: new_attributes, headers: valid_headers, as: :json
+        end.to change(Notebook, :count).by(0)
 
         existing_notebook.reload
         expect(existing_notebook.name).to eql('Updated Notebook')
@@ -121,6 +157,15 @@ RSpec.describe '/api/v1/notebooks', type: :request do
   end
 
   describe 'DELETE /destroy' do
+    it 'is prohibited when not signed in' do
+      expect do
+        delete api_v1_notebook_url(existing_notebook), as: :json
+      end.to change(user.notebooks, :count).by(0)
+
+      expect(response).to be_unauthorized
+      expect(response.body).to include("Not Authenticated")
+    end
+
     it 'destroys the requested notebook' do
       expect do
         delete api_v1_notebook_url(existing_notebook), headers: valid_headers, as: :json
