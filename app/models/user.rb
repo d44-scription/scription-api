@@ -6,7 +6,7 @@ class User < ApplicationRecord
 
   validates :display_name, length: { maximum: 25 }
 
-  has_many :notebooks
+  has_many :notebooks, dependent: :destroy
 
   def generate_jwt
     JWT.encode({ id: id,
