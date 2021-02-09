@@ -23,6 +23,13 @@ RSpec.describe '/api/v1/notebooks/:id/characters', type: :request do
   end
 
   describe 'GET /index' do
+    it 'is prohibited when not signed in' do
+      get api_v1_notebook_characters_url(notebook_1), as: :json
+
+      expect(response).to be_unauthorized
+      expect(response.body).to include("Not Authenticated")
+    end
+
     it 'scopes response to currently viewed notebook' do
       get api_v1_notebook_characters_url(notebook_1), headers: valid_headers, as: :json
 
