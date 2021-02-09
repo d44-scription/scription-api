@@ -1,3 +1,3 @@
-class ApiController < ApplicationController
+class Api::ApiController < ApplicationController
   before_action :authenticate_user!
 end
