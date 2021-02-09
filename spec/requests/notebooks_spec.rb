@@ -117,6 +117,10 @@ RSpec.describe '/api/v1/notebooks', type: :request do
                 params: new_attributes, as: :json
         end.to change(Notebook, :count).by(0)
 
+        existing_notebook.reload
+        expect(existing_notebook.name).not_to eql('Updated Notebook')
+        expect(existing_notebook.summary).not_to eql('Updated Summary')
+
         expect(response).to be_unauthorized
         expect(response.body).to include("Not Authenticated")
       end
