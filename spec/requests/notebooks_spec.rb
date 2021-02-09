@@ -4,10 +4,10 @@ require 'rails_helper'
 
 RSpec.describe '/api/v1/notebooks', type: :request do
   let!(:user) { FactoryBot.create(:user) }
-  let!(:existing_notebook) { FactoryBot.create(:notebook) }
+  let!(:existing_notebook) { FactoryBot.create(:notebook, user: user) }
 
-  let(:valid_attributes) { FactoryBot.attributes_for(:notebook) }
-  let(:invalid_attributes) { FactoryBot.attributes_for(:notebook, name: '0' * 46) }
+  let(:valid_attributes) { FactoryBot.attributes_for(:notebook, user: user) }
+  let(:invalid_attributes) { FactoryBot.attributes_for(:notebook, user: user, name: '0' * 46) }
 
   # This should return the minimal set of values that should be in the headers
   # in order to pass any filters (e.g. authentication) defined in
@@ -33,7 +33,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
     let!(:note) { FactoryBot.create(:note, notebook: existing_notebook) }
 
     it 'renders a successful response' do
-      get api_v1_notebook_url(existing_notebook), as: :json
+      get api_v1_notebook_url(existing_notebook), headers: valid_headers, as: :json
 
       expect(response).to be_successful
       expect(response.body).to include(existing_notebook.name)

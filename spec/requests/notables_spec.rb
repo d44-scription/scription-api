@@ -92,7 +92,7 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
 
   describe 'GET /show' do
     it 'renders a successful response when note is linked to given notebook' do
-      get api_v1_notebook_notable_url(notebook_1, item), as: :json
+      get api_v1_notebook_notable_url(notebook_1, item), headers: valid_headers, as: :json
 
       expect(response).to be_successful
       expect(response.body).to include(item.name)

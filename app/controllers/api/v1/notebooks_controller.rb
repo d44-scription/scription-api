@@ -7,11 +7,11 @@ module Api
       # skip_before_action :authenticate_user!, only: %i[index]
 
       def index
-        @notebooks = Notebook.all.order(:order_index)
+        @notebooks = current_user.notebooks.order(:order_index)
       end
 
       def create
-        @notebook = Notebook.new(notebook_params)
+        @notebook = current_user.notebooks.new(notebook_params)
 
         if @notebook.save
           render :show, status: :created
@@ -35,7 +35,7 @@ module Api
       private
 
       def fetch_notebook
-        @notebook = Notebook.find(params[:id])
+        @notebook = current_user.notebooks.find(params[:id])
       end
 
       def notebook_params
