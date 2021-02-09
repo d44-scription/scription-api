@@ -3,6 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
+  let!(:user) { FactoryBot.create(:user) }
   let!(:notebook_1) { FactoryBot.create(:notebook) }
 
   let!(:item) { FactoryBot.create(:item, notebook: notebook_1, name: 'Item') }
@@ -23,7 +24,7 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
   # NotesController, or in your router and rack
   # middleware. Be sure to keep this updated too.
   let(:valid_headers) do
-    {}
+    { 'Authorization': "Token #{user.generate_jwt}" }
   end
 
   describe 'GET /index' do
