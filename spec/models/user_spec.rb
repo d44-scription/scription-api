@@ -52,6 +52,16 @@ RSpec.describe User, type: :model do
       expect(user).to have(0).errors_on(:display_name)
       expect(user).not_to be_valid
     end
+
+    it 'is not valid when display name is too long' do
+      user.display_name = '1' * 26
+
+      expect(user).to have(0).errors_on(:email)
+      expect(user).to have(0).errors_on(:password)
+      expect(user).to have(0).errors_on(:password_confirmation)
+      expect(user).to have(1).errors_on(:display_name)
+      expect(user).not_to be_valid
+    end
   end
 
   describe 'relationships' do
