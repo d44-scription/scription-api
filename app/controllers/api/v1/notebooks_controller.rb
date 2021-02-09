@@ -4,6 +4,7 @@ module Api
   module V1
     class NotebooksController < ApplicationController
       before_action :fetch_notebook, only: %i[show update destroy]
+      skip_before_action :authenticate_user!, only: %i[index]
 
       def index
         @notebooks = Notebook.all.order(:order_index)

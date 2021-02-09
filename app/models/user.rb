@@ -6,6 +6,8 @@ class User < ApplicationRecord
 
   validates :display_name, length: { maximum: 25 }
 
+  has_many :notebooks
+
   def generate_jwt
     JWT.encode({ id: id,
                 exp: 60.days.from_now.to_i },

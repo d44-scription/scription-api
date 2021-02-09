@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Notebook < ApplicationRecord
+  belongs_to :user
   with_options dependent: :destroy do |model|
     model.has_many :notes
     model.has_many :notables

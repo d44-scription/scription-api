@@ -3,6 +3,7 @@
 class ApplicationController < ActionController::API
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :authenticate_user
+  before_action :authenticate_user!
 
   private
 
@@ -18,14 +19,14 @@ class ApplicationController < ActionController::API
 
           @current_user_id = jwt_payload['id']
         rescue JWT::ExpiredSignature, JWT::VerificationError, JWT::DecodeError
-          head :unauthorized
+          render json: { errors: ['Not Authenticated'] }, status: :unauthorized
         end
       end
     end
   end
 
   def authenticate_user!(options = {})
-    head :unauthorized unless signed_in?
+    render json: { errors: ['Not Authenticated'] }, status: :unauthorized unless signed_in?
   end
 
   def current_user
