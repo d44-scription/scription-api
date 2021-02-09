@@ -2,7 +2,7 @@
 
 module Api
   module V1
-    class CharactersController < ApplicationController
+    class CharactersController < ApiController
       before_action :fetch_notebook
 
       def index

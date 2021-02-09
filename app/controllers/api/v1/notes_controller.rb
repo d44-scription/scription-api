@@ -2,7 +2,7 @@
 
 module Api
   module V1
-    class NotesController < ApplicationController
+    class NotesController < ApiController
       before_action :fetch_notebook
       before_action :fetch_note, only: %i[show update destroy]
 
