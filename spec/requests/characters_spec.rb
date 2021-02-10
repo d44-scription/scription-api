@@ -5,8 +5,8 @@ require 'rails_helper'
 RSpec.describe '/api/v1/notebooks/:id/characters', type: :request do
   let!(:user) { FactoryBot.create(:user) }
 
-  let!(:notebook_1) { FactoryBot.create(:notebook) }
-  let!(:notebook_2) { FactoryBot.create(:notebook) }
+  let!(:notebook_1) { FactoryBot.create(:notebook, user: user) }
+  let!(:notebook_2) { FactoryBot.create(:notebook, user: user) }
 
   let!(:character_1) { FactoryBot.create(:character, notebook: notebook_1, name: 'Character 1') }
   let!(:character_2) { FactoryBot.create(:character, notebook: notebook_1, name: 'Character 2') }

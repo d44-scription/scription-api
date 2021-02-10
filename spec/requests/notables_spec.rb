@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
   let!(:user) { FactoryBot.create(:user) }
-  let!(:notebook_1) { FactoryBot.create(:notebook) }
+  let!(:notebook_1) { FactoryBot.create(:notebook, user: user) }
 
   let!(:item) { FactoryBot.create(:item, notebook: notebook_1, name: 'Item') }
   let!(:character) { FactoryBot.create(:item, notebook: notebook_1, name: 'Character') }
@@ -14,7 +14,7 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
   let(:character_attributes) { FactoryBot.attributes_for(:character, notebook: notebook_1) }
   let(:location_attributes) { FactoryBot.attributes_for(:location, notebook: notebook_1) }
 
-  let!(:invalid_notebook) { FactoryBot.create(:notebook) }
+  let!(:invalid_notebook) { FactoryBot.create(:notebook, user: user) }
   let!(:invalid_item) { FactoryBot.create(:item, notebook: invalid_notebook, name: 'Other Item') }
 
   let(:invalid_attributes) { FactoryBot.attributes_for(:item, type: nil) }
