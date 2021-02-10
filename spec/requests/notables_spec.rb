@@ -24,7 +24,7 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
   # NotesController, or in your router and rack
   # middleware. Be sure to keep this updated too.
   let(:valid_headers) do
-    { 'Authorization': "Token #{user.generate_jwt}" }
+    { Authorization: "Token #{user.generate_jwt}" }
   end
 
   describe 'GET /index' do
@@ -32,7 +32,7 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
       get api_v1_notebook_notables_url(notebook_1), as: :json
 
       expect(response).to be_unauthorized
-      expect(response.body).to include("Not Authenticated")
+      expect(response.body).to include('Not Authenticated')
     end
 
     it 'retrieves all notables for current notebook' do
@@ -64,7 +64,7 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
       get notes_api_v1_notebook_notable_url(notebook_1, item), as: :json
 
       expect(response).to be_unauthorized
-      expect(response.body).to include("Not Authenticated")
+      expect(response.body).to include('Not Authenticated')
     end
 
     it 'retrieves all notes for current notable' do
@@ -109,7 +109,7 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
       get api_v1_notebook_notable_url(notebook_1, item), as: :json
 
       expect(response).to be_unauthorized
-      expect(response.body).to include("Not Authenticated")
+      expect(response.body).to include('Not Authenticated')
     end
 
     it 'renders a successful response when note is linked to given notebook' do
@@ -131,13 +131,13 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
 
   describe 'POST /create' do
     it 'is prohibited when not signed in' do
-        expect do
-          post api_v1_notebook_notables_url(notebook_1),
-               params: item_attributes, as: :json
-        end.to change(notebook_1.items, :count).by(0)
+      expect do
+        post api_v1_notebook_notables_url(notebook_1),
+             params: item_attributes, as: :json
+      end.to change(notebook_1.items, :count).by(0)
 
       expect(response).to be_unauthorized
-      expect(response.body).to include("Not Authenticated")
+      expect(response.body).to include('Not Authenticated')
     end
 
     context 'with valid parameters' do
@@ -204,18 +204,17 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
     context 'with valid parameters' do
       let(:new_attributes) { FactoryBot.attributes_for(:item, name: 'Updated Item') }
 
-
       it 'is prohibited when not signed in' do
-          expect do
-            patch api_v1_notebook_notable_url(notebook_1, item),
-                  params: new_attributes, as: :json
-          end.to change(notebook_1.items, :count).by(0)
+        expect do
+          patch api_v1_notebook_notable_url(notebook_1, item),
+                params: new_attributes, as: :json
+        end.to change(notebook_1.items, :count).by(0)
 
-          item.reload
-          expect(item.name).not_to eql('Updated Item')
+        item.reload
+        expect(item.name).not_to eql('Updated Item')
 
         expect(response).to be_unauthorized
-        expect(response.body).to include("Not Authenticated")
+        expect(response.body).to include('Not Authenticated')
       end
 
       it 'updates the requested item' do
@@ -264,7 +263,7 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
       end.to change(notebook_1.notables, :count).by(0)
 
       expect(response).to be_unauthorized
-      expect(response.body).to include("Not Authenticated")
+      expect(response.body).to include('Not Authenticated')
     end
 
     it 'destroys only the requested note' do

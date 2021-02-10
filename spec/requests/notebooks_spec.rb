@@ -15,7 +15,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
   # NotebooksController, or in your router and rack
   # middleware. Be sure to keep this updated too.
   let(:valid_headers) do
-  { 'Authorization': "Token #{user.generate_jwt}" }
+    { Authorization: "Token #{user.generate_jwt}" }
   end
 
   describe 'GET /index' do
@@ -23,7 +23,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
       get api_v1_notebooks_url, as: :json
 
       expect(response).to be_unauthorized
-      expect(response.body).to include("Not Authenticated")
+      expect(response.body).to include('Not Authenticated')
     end
 
     it 'renders a successful response' do
@@ -47,7 +47,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
       get api_v1_notebook_url(existing_notebook), as: :json
 
       expect(response).to be_unauthorized
-      expect(response.body).to include("Not Authenticated")
+      expect(response.body).to include('Not Authenticated')
     end
 
     it 'renders a successful response' do
@@ -62,13 +62,13 @@ RSpec.describe '/api/v1/notebooks', type: :request do
   describe 'POST /create' do
     context 'with valid parameters' do
       it 'is prohibited when not signed in' do
-          expect do
-            post api_v1_notebooks_url,
-                params: valid_attributes, as: :json
-          end.to change(user.notebooks, :count).by(0)
+        expect do
+          post api_v1_notebooks_url,
+               params: valid_attributes, as: :json
+        end.to change(user.notebooks, :count).by(0)
 
         expect(response).to be_unauthorized
-        expect(response.body).to include("Not Authenticated")
+        expect(response.body).to include('Not Authenticated')
       end
 
       it 'creates a new Notebook' do
@@ -122,7 +122,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
         expect(existing_notebook.summary).not_to eql('Updated Summary')
 
         expect(response).to be_unauthorized
-        expect(response.body).to include("Not Authenticated")
+        expect(response.body).to include('Not Authenticated')
       end
 
       it 'updates the requested notebook' do
@@ -167,7 +167,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
       end.to change(user.notebooks, :count).by(0)
 
       expect(response).to be_unauthorized
-      expect(response.body).to include("Not Authenticated")
+      expect(response.body).to include('Not Authenticated')
     end
 
     it 'destroys the requested notebook' do

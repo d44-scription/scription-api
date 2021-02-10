@@ -11,7 +11,7 @@ RSpec.describe '/api/v1/users', type: :request do
   # NotesController, or in your router and rack
   # middleware. Be sure to keep this updated too.
   let(:valid_headers) do
-    { 'Authorization': "Token #{user_1.generate_jwt}" }
+    { Authorization: "Token #{user_1.generate_jwt}" }
   end
 
   describe 'GET /show' do
@@ -19,7 +19,7 @@ RSpec.describe '/api/v1/users', type: :request do
       get api_v1_user_url(user_1.id), as: :json
 
       expect(response).to be_unauthorized
-      expect(response.body).to include("Not Authenticated")
+      expect(response.body).to include('Not Authenticated')
     end
 
     it 'renders a successful response when note is linked to given notebook' do
@@ -51,7 +51,7 @@ RSpec.describe '/api/v1/users', type: :request do
         expect(user_1.email).not_to eql(new_attributes[:email])
 
         expect(response).to be_unauthorized
-        expect(response.body).to include("Not Authenticated")
+        expect(response.body).to include('Not Authenticated')
       end
 
       it 'updates the requested user' do

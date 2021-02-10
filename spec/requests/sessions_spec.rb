@@ -22,7 +22,7 @@ RSpec.describe 'devise/sessions', type: :request do
     context 'with invalid parameters' do
       it 'does not create when password does not match' do
         post user_session_url,
-              params: { user: { email: user.email, password: '-' } }, as: :json
+             params: { user: { email: user.email, password: '-' } }, as: :json
 
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to match(a_string_including('application/json'))
@@ -31,7 +31,7 @@ RSpec.describe 'devise/sessions', type: :request do
 
       it 'does not create when email is not found' do
         post user_session_url,
-              params: { user: { email: 'fake@example.com', password: 'superSecret123!' } }, as: :json
+             params: { user: { email: 'fake@example.com', password: 'superSecret123!' } }, as: :json
 
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to match(a_string_including('application/json'))

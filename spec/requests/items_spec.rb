@@ -19,7 +19,7 @@ RSpec.describe '/api/v1/notebooks/:id/items', type: :request do
   # NotesController, or in your router and rack
   # middleware. Be sure to keep this updated too.
   let(:valid_headers) do
-    { 'Authorization': "Token #{user.generate_jwt}" }
+    { Authorization: "Token #{user.generate_jwt}" }
   end
 
   describe 'GET /index' do
@@ -27,7 +27,7 @@ RSpec.describe '/api/v1/notebooks/:id/items', type: :request do
       get api_v1_notebook_items_url(notebook_1), as: :json
 
       expect(response).to be_unauthorized
-      expect(response.body).to include("Not Authenticated")
+      expect(response.body).to include('Not Authenticated')
     end
 
     it 'scopes response to currently viewed notebook' do
