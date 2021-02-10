@@ -3,8 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe '/api/v1/notebooks/:id/locations', type: :request do
-  let!(:notebook_1) { FactoryBot.create(:notebook) }
-  let!(:notebook_2) { FactoryBot.create(:notebook) }
+  let!(:user) { FactoryBot.create(:user) }
+
+  let!(:notebook_1) { FactoryBot.create(:notebook, user: user) }
+  let!(:notebook_2) { FactoryBot.create(:notebook, user: user) }
 
   let!(:location_1) { FactoryBot.create(:location, notebook: notebook_1, name: 'Location 1') }
   let!(:location_2) { FactoryBot.create(:location, notebook: notebook_1, name: 'Location 2') }
@@ -17,10 +19,17 @@ RSpec.describe '/api/v1/notebooks/:id/locations', type: :request do
   # NotesController, or in your router and rack
   # middleware. Be sure to keep this updated too.
   let(:valid_headers) do
-    {}
+    { Authorization: "Token #{user.generate_jwt}" }
   end
 
   describe 'GET /index' do
+    it 'is prohibited when not signed in' do
+      get api_v1_notebook_locations_url(notebook_1), as: :json
+
+      expect(response).to be_unauthorized
+      expect(response.body).to include('Not Authenticated')
+    end
+
     it 'scopes response to currently viewed notebook' do
       get api_v1_notebook_locations_url(notebook_1), headers: valid_headers, as: :json
 

@@ -9,6 +9,7 @@ RSpec.describe Notebook, type: :model do
     it 'is valid when attributes are correct' do
       expect(notebook).to have(0).errors_on(:name)
       expect(notebook).to have(0).errors_on(:summary)
+      expect(notebook).to have(0).errors_on(:user)
       expect(notebook).to be_valid
     end
 
@@ -17,6 +18,7 @@ RSpec.describe Notebook, type: :model do
 
       expect(notebook).to have(0).errors_on(:name)
       expect(notebook).to have(0).errors_on(:summary)
+      expect(notebook).to have(0).errors_on(:user)
       expect(notebook).to be_valid
     end
 
@@ -48,6 +50,7 @@ RSpec.describe Notebook, type: :model do
 
       expect(notebook).to have(1).errors_on(:name)
       expect(notebook).to have(0).errors_on(:summary)
+      expect(notebook).to have(0).errors_on(:user)
       expect(notebook).not_to be_valid
     end
 
@@ -56,6 +59,7 @@ RSpec.describe Notebook, type: :model do
 
       expect(notebook).to have(1).errors_on(:name)
       expect(notebook).to have(0).errors_on(:summary)
+      expect(notebook).to have(0).errors_on(:user)
       expect(notebook).not_to be_valid
     end
 
@@ -64,6 +68,16 @@ RSpec.describe Notebook, type: :model do
 
       expect(notebook).to have(0).errors_on(:name)
       expect(notebook).to have(1).errors_on(:summary)
+      expect(notebook).to have(0).errors_on(:user)
+      expect(notebook).not_to be_valid
+    end
+
+    it 'is not valid when no user provided' do
+      notebook.user = nil
+
+      expect(notebook).to have(0).errors_on(:name)
+      expect(notebook).to have(0).errors_on(:summary)
+      expect(notebook).to have(1).errors_on(:user)
       expect(notebook).not_to be_valid
     end
   end
@@ -78,7 +92,7 @@ RSpec.describe Notebook, type: :model do
 
       expect do
         notebook.destroy
-      end.to change(Notebook, :count).by(-1)
+      end.to change(Note, :count).by(-1)
     end
 
     it 'successfully creates and destroys an associated item' do
@@ -88,7 +102,7 @@ RSpec.describe Notebook, type: :model do
 
       expect do
         notebook.destroy
-      end.to change(Notebook, :count).by(-1)
+      end.to change(Item, :count).by(-1)
     end
 
     it 'successfully creates and destroys an associated character' do
@@ -98,7 +112,7 @@ RSpec.describe Notebook, type: :model do
 
       expect do
         notebook.destroy
-      end.to change(Notebook, :count).by(-1)
+      end.to change(Character, :count).by(-1)
     end
 
     it 'successfully creates and destroys an associated location' do
@@ -108,7 +122,7 @@ RSpec.describe Notebook, type: :model do
 
       expect do
         notebook.destroy
-      end.to change(Notebook, :count).by(-1)
+      end.to change(Location, :count).by(-1)
     end
   end
 end

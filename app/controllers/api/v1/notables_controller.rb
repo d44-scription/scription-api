@@ -2,7 +2,7 @@
 
 module Api
   module V1
-    class NotablesController < ApplicationController
+    class NotablesController < ApiController
       before_action :fetch_notebook
       before_action :fetch_notable, only: %i[notes show update destroy]
 
@@ -39,7 +39,7 @@ module Api
       private
 
       def fetch_notebook
-        @notebook = Notebook.find(params[:notebook_id])
+        @notebook = current_user.notebooks.find(params[:notebook_id])
       end
 
       def fetch_notable

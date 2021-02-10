@@ -3,7 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
-  let!(:notebook_1) { FactoryBot.create(:notebook) }
+  let!(:user) { FactoryBot.create(:user) }
+  let!(:notebook_1) { FactoryBot.create(:notebook, user: user) }
 
   let!(:item) { FactoryBot.create(:item, notebook: notebook_1, name: 'Item') }
   let!(:character) { FactoryBot.create(:item, notebook: notebook_1, name: 'Character') }
@@ -13,7 +14,7 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
   let(:character_attributes) { FactoryBot.attributes_for(:character, notebook: notebook_1) }
   let(:location_attributes) { FactoryBot.attributes_for(:location, notebook: notebook_1) }
 
-  let!(:invalid_notebook) { FactoryBot.create(:notebook) }
+  let!(:invalid_notebook) { FactoryBot.create(:notebook, user: user) }
   let!(:invalid_item) { FactoryBot.create(:item, notebook: invalid_notebook, name: 'Other Item') }
 
   let(:invalid_attributes) { FactoryBot.attributes_for(:item, type: nil) }
@@ -23,10 +24,17 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
   # NotesController, or in your router and rack
   # middleware. Be sure to keep this updated too.
   let(:valid_headers) do
-    {}
+    { Authorization: "Token #{user.generate_jwt}" }
   end
 
   describe 'GET /index' do
+    it 'is prohibited when not signed in' do
+      get api_v1_notebook_notables_url(notebook_1), as: :json
+
+      expect(response).to be_unauthorized
+      expect(response.body).to include('Not Authenticated')
+    end
+
     it 'retrieves all notables for current notebook' do
       get api_v1_notebook_notables_url(notebook_1), headers: valid_headers, as: :json
 
@@ -52,8 +60,15 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
     let!(:note_2) { FactoryBot.create(:note, notebook: notebook_1, content: "Note 2 :[#{item.name}](:#{item.id})") }
     let!(:note_3) { FactoryBot.create(:note, notebook: notebook_1, content: "Note 3 :[#{item.name}](:#{item.id}) :[#{item.name}](:#{item.id}) :[#{item.name}](:#{item.id})") }
 
+    it 'is prohibited when not signed in' do
+      get notes_api_v1_notebook_notable_url(notebook_1, item), as: :json
+
+      expect(response).to be_unauthorized
+      expect(response.body).to include('Not Authenticated')
+    end
+
     it 'retrieves all notes for current notable' do
-      get notes_api_v1_notebook_notable_path(notebook_1, item), headers: valid_headers, as: :json
+      get notes_api_v1_notebook_notable_url(notebook_1, item), headers: valid_headers, as: :json
 
       expect(response).to be_successful
       expect(response.body).to include(note_1.content)
@@ -75,7 +90,7 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
     it 'retrieves notes in correct order' do
       note_1.update(order_index: 50)
 
-      get notes_api_v1_notebook_notable_path(notebook_1, item), headers: valid_headers, as: :json
+      get notes_api_v1_notebook_notable_url(notebook_1, item), headers: valid_headers, as: :json
 
       expect(response).to be_successful
       expect(response.body).to include(note_1.content)
@@ -90,8 +105,15 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
   end
 
   describe 'GET /show' do
-    it 'renders a successful response when note is linked to given notebook' do
+    it 'is prohibited when not signed in' do
       get api_v1_notebook_notable_url(notebook_1, item), as: :json
+
+      expect(response).to be_unauthorized
+      expect(response.body).to include('Not Authenticated')
+    end
+
+    it 'renders a successful response when note is linked to given notebook' do
+      get api_v1_notebook_notable_url(notebook_1, item), headers: valid_headers, as: :json
 
       expect(response).to be_successful
       expect(response.body).to include(item.name)
@@ -108,6 +130,16 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
   end
 
   describe 'POST /create' do
+    it 'is prohibited when not signed in' do
+      expect do
+        post api_v1_notebook_notables_url(notebook_1),
+             params: item_attributes, as: :json
+      end.to change(notebook_1.items, :count).by(0)
+
+      expect(response).to be_unauthorized
+      expect(response.body).to include('Not Authenticated')
+    end
+
     context 'with valid parameters' do
       it 'creates a new Item' do
         expect do
@@ -172,6 +204,19 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
     context 'with valid parameters' do
       let(:new_attributes) { FactoryBot.attributes_for(:item, name: 'Updated Item') }
 
+      it 'is prohibited when not signed in' do
+        expect do
+          patch api_v1_notebook_notable_url(notebook_1, item),
+                params: new_attributes, as: :json
+        end.to change(notebook_1.items, :count).by(0)
+
+        item.reload
+        expect(item.name).not_to eql('Updated Item')
+
+        expect(response).to be_unauthorized
+        expect(response.body).to include('Not Authenticated')
+      end
+
       it 'updates the requested item' do
         expect do
           patch api_v1_notebook_notable_url(notebook_1, item),
@@ -212,6 +257,15 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
   end
 
   describe 'DELETE /destroy' do
+    it 'is prohibited when not signed in' do
+      expect do
+        delete api_v1_notebook_notable_url(notebook_1, item), as: :json
+      end.to change(notebook_1.notables, :count).by(0)
+
+      expect(response).to be_unauthorized
+      expect(response.body).to include('Not Authenticated')
+    end
+
     it 'destroys only the requested note' do
       expect do
         delete api_v1_notebook_notable_url(notebook_1, item), headers: valid_headers, as: :json

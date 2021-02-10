@@ -2,7 +2,7 @@
 
 module Api
   module V1
-    class CharactersController < ApplicationController
+    class CharactersController < ApiController
       before_action :fetch_notebook
 
       def index
@@ -14,7 +14,7 @@ module Api
       private
 
       def fetch_notebook
-        @notebook = Notebook.find(params[:notebook_id])
+        @notebook = current_user.notebooks.find(params[:notebook_id])
       end
     end
   end
