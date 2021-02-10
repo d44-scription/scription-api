@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe '/api/v1/users', type: :request do
+RSpec.describe 'devis/registrations', type: :request do
   let!(:existing_user) { FactoryBot.create(:user) }
 
   let!(:valid_attributes) { FactoryBot.attributes_for(:user, display_name: 'Test Display Name') }
@@ -10,13 +10,13 @@ RSpec.describe '/api/v1/users', type: :request do
 
   # This should return the minimal set of values that should be in the headers
   # in order to pass any filters (e.g. authentication) defined in
-  # NotesController, or in your router and rack
+  # RegistrationsController, or in your router and rack
   # middleware. Be sure to keep this updated too.
   let(:valid_headers) do
     { 'Authorization': "Token #{existing_user.generate_jwt}" }
   end
 
-  describe 'POST /registrations/create' do
+  describe 'POST /create' do
     context 'with valid parameters' do
       it 'is permitted when not signed in' do
         expect do
