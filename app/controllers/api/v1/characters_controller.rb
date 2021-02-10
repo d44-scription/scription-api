@@ -14,7 +14,7 @@ module Api
       private
 
       def fetch_notebook
-        @notebook = Notebook.find(params[:notebook_id])
+        @notebook = current_user.notebooks.find(params[:notebook_id])
       end
     end
   end
