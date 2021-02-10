@@ -8,7 +8,7 @@ RSpec.describe 'devise/sessions', type: :request do
   describe 'POST /create' do
     context 'with valid parameters' do
       it 'renders a JSON response with the new session' do
-        post user_session_path, as: :json, params: { user: { email: user.email, password: 'superSecret123!' } }
+        post user_session_url, as: :json, params: { user: { email: user.email, password: 'superSecret123!' } }
 
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to match(a_string_including('application/json'))
@@ -21,7 +21,7 @@ RSpec.describe 'devise/sessions', type: :request do
 
     context 'with invalid parameters' do
       it 'does not create when password does not match' do
-        post user_session_path,
+        post user_session_url,
               params: { user: { email: user.email, password: '-' } }, as: :json
 
         expect(response).to have_http_status(:unprocessable_entity)
@@ -30,7 +30,7 @@ RSpec.describe 'devise/sessions', type: :request do
       end
 
       it 'does not create when email is not found' do
-        post user_session_path,
+        post user_session_url,
               params: { user: { email: 'fake@example.com', password: 'superSecret123!' } }, as: :json
 
         expect(response).to have_http_status(:unprocessable_entity)

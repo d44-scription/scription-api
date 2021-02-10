@@ -5,10 +5,10 @@ module Api
       end
 
       def update
-        if current_user.update_attributes(user_params)
+        if current_user.update(user_params)
           render :show
         else
-          render json: { errors: current_user.errors }, status: :unprocessable_entity
+          render json: current_user.errors.full_messages, status: :unprocessable_entity
         end
       end
 

@@ -61,14 +61,14 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
     let!(:note_3) { FactoryBot.create(:note, notebook: notebook_1, content: "Note 3 :[#{item.name}](:#{item.id}) :[#{item.name}](:#{item.id}) :[#{item.name}](:#{item.id})") }
 
     it 'is prohibited when not signed in' do
-      get notes_api_v1_notebook_notable_path(notebook_1, item), as: :json
+      get notes_api_v1_notebook_notable_url(notebook_1, item), as: :json
 
       expect(response).to be_unauthorized
       expect(response.body).to include("Not Authenticated")
     end
 
     it 'retrieves all notes for current notable' do
-      get notes_api_v1_notebook_notable_path(notebook_1, item), headers: valid_headers, as: :json
+      get notes_api_v1_notebook_notable_url(notebook_1, item), headers: valid_headers, as: :json
 
       expect(response).to be_successful
       expect(response.body).to include(note_1.content)
@@ -90,7 +90,7 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
     it 'retrieves notes in correct order' do
       note_1.update(order_index: 50)
 
-      get notes_api_v1_notebook_notable_path(notebook_1, item), headers: valid_headers, as: :json
+      get notes_api_v1_notebook_notable_url(notebook_1, item), headers: valid_headers, as: :json
 
       expect(response).to be_successful
       expect(response.body).to include(note_1.content)
