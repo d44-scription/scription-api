@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'devis/registrations', type: :request do
+RSpec.describe 'devise/registrations', type: :request do
   let!(:existing_user) { FactoryBot.create(:user) }
 
   let!(:valid_attributes) { FactoryBot.attributes_for(:user, display_name: 'Test Display Name') }
