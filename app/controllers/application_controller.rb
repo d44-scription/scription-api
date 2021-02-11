@@ -28,7 +28,7 @@ class ApplicationController < ActionController::API
       render json: { errors: ['Expired signature'] }, status: :unauthorized
 
     rescue  JWT::DecodeError
-      render json: { errors: ['Decode error'] }, status: :unauthorized
+      render json: { errors: ["#{token.inspect}"] }, status: :unauthorized
 
     end
   end
