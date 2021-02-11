@@ -17,7 +17,6 @@ class ApplicationController < ActionController::API
     render json: { errors: ['Not Authenticated'] }, status: :unauthorized && return unless request.headers['Authorization'].present?
 
     authenticate_or_request_with_http_token do |token|
-      raise Rails.application.secrets.secret_key_base.inspect
       jwt_payload = JWT.decode(token, Rails.application.secrets.secret_key_base).first
 
       @current_user_id = jwt_payload['id']
@@ -29,7 +28,7 @@ class ApplicationController < ActionController::API
       render json: { errors: ['Expired signature'] }, status: :unauthorized
 
     rescue  JWT::DecodeError
-      render json: { errors: ["#{token.inspect}"] }, status: :unauthorized
+      render json: { errors: ["#{Rails.application.secrets.secret_key_base.inspect}"] }, status: :unauthorized
 
     end
   end
