@@ -20,7 +20,6 @@ class ApplicationController < ActionController::API
       jwt_payload = JWT.decode(token, Rails.application.secrets.secret_key_base).first
 
       @current_user_id = jwt_payload['id']
-          raise 'here'
     rescue JWT::VerificationError
       render json: { errors: ['Verification error'] }, status: :unauthorized
     end
@@ -35,7 +34,7 @@ class ApplicationController < ActionController::API
   end
 
   def authenticate_user!(_options = {})
-    render json: { errors: ['Not Authenticated'] }, status: :unauthorized unless signed_in?
+    render json: { errors: ['Not signed in'] }, status: :unauthorized unless signed_in?
   end
 
   def current_user
