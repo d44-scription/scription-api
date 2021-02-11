@@ -17,7 +17,7 @@ class ApplicationController < ActionController::API
     render json: { errors: ['Not Authenticated'] }, status: :unauthorized && return unless request.headers['Authorization'].present?
 
     authenticate_or_request_with_http_token do |token|
-      jwt_payload = JWT.decode(token, Rails.application.secrets.secret_key_base).first
+      jwt_payload = JWT.decode(token, Rails.application.secrets.secret_key_base || ENV["SECRET_KEY_BASE"]).first
 
       @current_user_id = jwt_payload['id']
 
