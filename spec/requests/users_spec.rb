@@ -6,14 +6,6 @@ RSpec.describe '/api/v1/users', type: :request do
   let!(:user_1) { FactoryBot.create(:user, display_name: 'User 1') }
   let!(:user_2) { FactoryBot.create(:user, display_name: 'User 2') }
 
-  # This should return the minimal set of values that should be in the headers
-  # in order to pass any filters (e.g. authentication) defined in
-  # NotesController, or in your router and rack
-  # middleware. Be sure to keep this updated too.
-  let(:valid_headers) do
-    { Authorization: "Token #{user_1.generate_jwt}" }
-  end
-
   describe 'GET /show' do
     it 'is prohibited when not signed in' do
       get api_v1_user_url(user_1.id), as: :json
@@ -28,7 +20,7 @@ RSpec.describe '/api/v1/users', type: :request do
     end
 
       it 'renders a successful response when note is linked to given notebook' do
-        get api_v1_user_url(user_1.id), headers: valid_headers, as: :json
+        get api_v1_user_url(user_1.id), as: :json
 
         expect(response).to be_successful
         expect(response.body).to include(user_1.display_name)
@@ -66,7 +58,7 @@ RSpec.describe '/api/v1/users', type: :request do
         it 'updates the requested user' do
           expect do
             patch api_v1_user_url(user_1),
-                  params: new_attributes, headers: valid_headers, as: :json
+                  params: new_attributes, as: :json
           end.to change(User, :count).by(0)
 
           user_1.reload
@@ -76,7 +68,7 @@ RSpec.describe '/api/v1/users', type: :request do
 
         it 'renders a JSON response with the user' do
           patch api_v1_user_url(user_1),
-                params: new_attributes, headers: valid_headers, as: :json
+                params: new_attributes, as: :json
 
           expect(response).to have_http_status(:ok)
           expect(response.content_type).to eq('application/json; charset=utf-8')
@@ -93,7 +85,7 @@ RSpec.describe '/api/v1/users', type: :request do
 
       it 'renders a JSON response with errors for the notebook' do
         patch api_v1_user_url(user_1),
-              params: invalid_attributes, headers: valid_headers, as: :json
+              params: invalid_attributes, as: :json
 
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json; charset=utf-8')
