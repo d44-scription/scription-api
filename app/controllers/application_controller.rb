@@ -2,7 +2,6 @@
 
 class ApplicationController < ActionController::API
   include ::ActionController::Cookies
-  include ActionController::HttpAuthentication::Token::ControllerMethods
   respond_to :json
 
   before_action :configure_permitted_parameters, if: :devise_controller?
