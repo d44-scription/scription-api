@@ -14,10 +14,10 @@ RSpec.describe '/api/v1/users', type: :request do
       expect(response.body).to include('Not Authenticated')
     end
 
-  context 'when signed in' do
-    before do
-      post user_session_url, as: :json, params: { user: { email: user_1.email, password: 'superSecret123!' } }
-    end
+    context 'when signed in' do
+      before do
+        post user_session_url, as: :json, params: { user: { email: user_1.email, password: 'superSecret123!' } }
+      end
 
       it 'renders a successful response when note is linked to given notebook' do
         get api_v1_user_url(user_1.id), as: :json

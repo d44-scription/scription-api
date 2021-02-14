@@ -105,13 +105,13 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
         it 'creates a new Note' do
           expect do
             post api_v1_notebook_notes_url(notebook_1),
-                params: valid_attributes, as: :json
+                 params: valid_attributes, as: :json
           end.to change(notebook_1.notes, :count).by(1)
         end
 
         it 'renders a JSON response with the new note' do
           post api_v1_notebook_notes_url(notebook_1),
-              params: valid_attributes, as: :json
+               params: valid_attributes, as: :json
 
           expect(response).to have_http_status(:created)
           expect(response.content_type).to match(a_string_including('application/json'))

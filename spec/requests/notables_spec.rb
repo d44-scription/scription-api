@@ -159,27 +159,27 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
         it 'creates a new Item' do
           expect do
             post api_v1_notebook_notables_url(notebook_1),
-                params: item_attributes, as: :json
+                 params: item_attributes, as: :json
           end.to change(notebook_1.items, :count).by(1)
         end
 
         it 'creates a new Character' do
           expect do
             post api_v1_notebook_notables_url(notebook_1),
-                params: character_attributes, as: :json
+                 params: character_attributes, as: :json
           end.to change(notebook_1.characters, :count).by(1)
         end
 
         it 'creates a new Location' do
           expect do
             post api_v1_notebook_notables_url(notebook_1),
-                params: location_attributes, as: :json
+                 params: location_attributes, as: :json
           end.to change(notebook_1.locations, :count).by(1)
         end
 
         it 'renders a JSON response with the new notable' do
           post api_v1_notebook_notables_url(notebook_1),
-              params: item_attributes, as: :json
+               params: item_attributes, as: :json
 
           expect(response).to have_http_status(:created)
           expect(response.content_type).to match(a_string_including('application/json'))
@@ -203,13 +203,13 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
         it 'does not create a new notable' do
           expect do
             post api_v1_notebook_notables_url(notebook_1),
-                params: invalid_attributes, as: :json
+                 params: invalid_attributes, as: :json
           end.to change(Item, :count).by(0)
         end
 
         it 'renders a JSON response with errors for the new notable' do
           post api_v1_notebook_notables_url(notebook_1),
-              params: invalid_attributes, as: :json
+               params: invalid_attributes, as: :json
 
           expect(response).to have_http_status(:unprocessable_entity)
           expect(response.content_type).to eq('application/json; charset=utf-8')
