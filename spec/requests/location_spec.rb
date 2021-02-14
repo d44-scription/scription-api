@@ -14,14 +14,6 @@ RSpec.describe '/api/v1/notebooks/:id/locations', type: :request do
   let!(:item) { FactoryBot.create(:item, notebook: notebook_1, name: 'Item') }
   let!(:character) { FactoryBot.create(:character, notebook: notebook_1, name: 'Character') }
 
-  # This should return the minimal set of values that should be in the headers
-  # in order to pass any filters (e.g. authentication) defined in
-  # NotesController, or in your router and rack
-  # middleware. Be sure to keep this updated too.
-  let(:valid_headers) do
-    { Authorization: "Token #{user.generate_jwt}" }
-  end
-
   describe 'GET /index' do
     it 'is prohibited when not signed in' do
       get api_v1_notebook_locations_url(notebook_1), as: :json
@@ -30,89 +22,95 @@ RSpec.describe '/api/v1/notebooks/:id/locations', type: :request do
       expect(response.body).to include('Not Authenticated')
     end
 
-    it 'scopes response to currently viewed notebook' do
-      get api_v1_notebook_locations_url(notebook_1), headers: valid_headers, as: :json
-
-      expect(response).to be_successful
-      expect(response.body).to include(location_1.name)
-      expect(response.body).to include(location_1.text_code)
-      expect(response.body).to include(location_2.name)
-      expect(response.body).to include(location_2.text_code)
-
-      expect(response.body).not_to include(location_3.name)
-      expect(response.body).not_to include(item.name)
-      expect(response.body).not_to include(character.name)
-    end
-
-    it 'correctly sorts locations by order index' do
-      location_1.update(order_index: 50)
-
-      get api_v1_notebook_locations_url(notebook_1), headers: valid_headers, as: :json
-
-      expect(response).to be_successful
-      expect(response.body).to include(location_1.name)
-      expect(response.body).to include(location_2.name)
-
-      json = JSON.parse(response.body)
-
-      expect(json.first['name']).to eql(location_2.name)
-      expect(json.second['name']).to eql(location_1.name)
-    end
-
-    describe 'when searching' do
-      let!(:location_4) { FactoryBot.create(:location, notebook: notebook_1, name: 'Different Location') }
-      let!(:location_5) { FactoryBot.create(:location, notebook: notebook_1, name: 'Another Location') }
-
-      it 'returns a subset of locations matching the search query' do
-        get api_v1_notebook_locations_url(notebook_1, q: 'Different'), headers: valid_headers, as: :json
-
-        expect(response).to be_successful
-        expect(response.body).not_to include(location_1.name)
-        expect(response.body).to include(location_4.name)
-        expect(response.body).not_to include(location_5.name)
-
-        expect(response.body).not_to include(location_3.name)
-        expect(response.body).not_to include(item.name)
-        expect(response.body).not_to include(character.name)
+    context 'when signed in' do
+      before do
+        post user_session_url, as: :json, params: { user: { email: user.email, password: 'superSecret123!' } }
       end
 
-      it 'returns an empty array when no locations match the query' do
-        get api_v1_notebook_locations_url(notebook_1, q: 'TEST'), headers: valid_headers, as: :json
-
-        expect(response).to be_successful
-        expect(response.body).not_to include(location_1.name)
-        expect(response.body).not_to include(location_4.name)
-        expect(response.body).not_to include(location_5.name)
-
-        expect(response.body).not_to include(location_3.name)
-        expect(response.body).not_to include(item.name)
-        expect(response.body).not_to include(character.name)
-      end
-
-      it 'returns all locations when all match the query' do
-        get api_v1_notebook_locations_url(notebook_1, q: 'Location'), headers: valid_headers, as: :json
+      it 'scopes response to currently viewed notebook' do
+        get api_v1_notebook_locations_url(notebook_1), as: :json
 
         expect(response).to be_successful
         expect(response.body).to include(location_1.name)
-        expect(response.body).to include(location_4.name)
-        expect(response.body).to include(location_5.name)
+        expect(response.body).to include(location_1.text_code)
+        expect(response.body).to include(location_2.name)
+        expect(response.body).to include(location_2.text_code)
 
         expect(response.body).not_to include(location_3.name)
         expect(response.body).not_to include(item.name)
         expect(response.body).not_to include(character.name)
       end
 
-      it 'ignores case when searching' do
-        get api_v1_notebook_locations_url(notebook_1, q: 'aNoThEr'), headers: valid_headers, as: :json
+      it 'correctly sorts locations by order index' do
+        location_1.update(order_index: 50)
+
+        get api_v1_notebook_locations_url(notebook_1), as: :json
 
         expect(response).to be_successful
-        expect(response.body).not_to include(location_1.name)
-        expect(response.body).not_to include(location_4.name)
-        expect(response.body).to include(location_5.name)
+        expect(response.body).to include(location_1.name)
+        expect(response.body).to include(location_2.name)
 
-        expect(response.body).not_to include(location_3.name)
-        expect(response.body).not_to include(item.name)
-        expect(response.body).not_to include(character.name)
+        json = JSON.parse(response.body)
+
+        expect(json.first['name']).to eql(location_2.name)
+        expect(json.second['name']).to eql(location_1.name)
+      end
+
+      describe 'when searching' do
+        let!(:location_4) { FactoryBot.create(:location, notebook: notebook_1, name: 'Different Location') }
+        let!(:location_5) { FactoryBot.create(:location, notebook: notebook_1, name: 'Another Location') }
+
+        it 'returns a subset of locations matching the search query' do
+          get api_v1_notebook_locations_url(notebook_1, q: 'Different'), as: :json
+
+          expect(response).to be_successful
+          expect(response.body).not_to include(location_1.name)
+          expect(response.body).to include(location_4.name)
+          expect(response.body).not_to include(location_5.name)
+
+          expect(response.body).not_to include(location_3.name)
+          expect(response.body).not_to include(item.name)
+          expect(response.body).not_to include(character.name)
+        end
+
+        it 'returns an empty array when no locations match the query' do
+          get api_v1_notebook_locations_url(notebook_1, q: 'TEST'), as: :json
+
+          expect(response).to be_successful
+          expect(response.body).not_to include(location_1.name)
+          expect(response.body).not_to include(location_4.name)
+          expect(response.body).not_to include(location_5.name)
+
+          expect(response.body).not_to include(location_3.name)
+          expect(response.body).not_to include(item.name)
+          expect(response.body).not_to include(character.name)
+        end
+
+        it 'returns all locations when all match the query' do
+          get api_v1_notebook_locations_url(notebook_1, q: 'Location'), as: :json
+
+          expect(response).to be_successful
+          expect(response.body).to include(location_1.name)
+          expect(response.body).to include(location_4.name)
+          expect(response.body).to include(location_5.name)
+
+          expect(response.body).not_to include(location_3.name)
+          expect(response.body).not_to include(item.name)
+          expect(response.body).not_to include(character.name)
+        end
+
+        it 'ignores case when searching' do
+          get api_v1_notebook_locations_url(notebook_1, q: 'aNoThEr'), as: :json
+
+          expect(response).to be_successful
+          expect(response.body).not_to include(location_1.name)
+          expect(response.body).not_to include(location_4.name)
+          expect(response.body).to include(location_5.name)
+
+          expect(response.body).not_to include(location_3.name)
+          expect(response.body).not_to include(item.name)
+          expect(response.body).not_to include(character.name)
+        end
       end
     end
   end
