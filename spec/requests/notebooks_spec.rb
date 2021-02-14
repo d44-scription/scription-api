@@ -26,17 +26,23 @@ RSpec.describe '/api/v1/notebooks', type: :request do
       expect(response.body).to include('Not Authenticated')
     end
 
-    it 'renders a successful response' do
-      get api_v1_notebooks_url, headers: valid_headers, as: :json
+    context 'when signed in' do
+      before do
+        post user_session_url, as: :json, params: { user: { email: user.email, password: 'superSecret123!' } }
+      end
 
-      expect(response).to be_successful
-      expect(response.body).to include(existing_notebook.name)
-      expect(response.body).to include(existing_notebook.summary)
-      expect(response.body).to include(existing_notebook.order_index.to_s)
+      it 'renders a successful response' do
+        get api_v1_notebooks_url, headers: valid_headers, as: :json
 
-      # Confirm response is scoped to current user & only includes created books
-      expect(response.body).not_to include(valid_attributes[:name])
-      expect(response.body).not_to include(existing_notebook_2.name)
+        expect(response).to be_successful
+        expect(response.body).to include(existing_notebook.name)
+        expect(response.body).to include(existing_notebook.summary)
+        expect(response.body).to include(existing_notebook.order_index.to_s)
+
+        # Confirm response is scoped to current user & only includes created books
+        expect(response.body).not_to include(valid_attributes[:name])
+        expect(response.body).not_to include(existing_notebook_2.name)
+      end
     end
   end
 
@@ -50,12 +56,18 @@ RSpec.describe '/api/v1/notebooks', type: :request do
       expect(response.body).to include('Not Authenticated')
     end
 
-    it 'renders a successful response' do
-      get api_v1_notebook_url(existing_notebook), headers: valid_headers, as: :json
+    context 'when signed in' do
+      before do
+        post user_session_url, as: :json, params: { user: { email: user.email, password: 'superSecret123!' } }
+      end
 
-      expect(response).to be_successful
-      expect(response.body).to include(existing_notebook.name)
-      expect(response.body).to include(note.content)
+      it 'renders a successful response' do
+        get api_v1_notebook_url(existing_notebook), headers: valid_headers, as: :json
+
+        expect(response).to be_successful
+        expect(response.body).to include(existing_notebook.name)
+        expect(response.body).to include(note.content)
+      end
     end
   end
 
@@ -71,23 +83,33 @@ RSpec.describe '/api/v1/notebooks', type: :request do
         expect(response.body).to include('Not Authenticated')
       end
 
-      it 'creates a new Notebook' do
-        expect do
+      context 'when signed in' do
+        before do
+          post user_session_url, as: :json, params: { user: { email: user.email, password: 'superSecret123!' } }
+        end
+
+        it 'creates a new Notebook' do
+          expect do
+            post api_v1_notebooks_url,
+                params: valid_attributes, headers: valid_headers, as: :json
+          end.to change(user.notebooks, :count).by(1)
+        end
+
+        it 'renders a JSON response with the new notebook' do
           post api_v1_notebooks_url,
-               params: valid_attributes, headers: valid_headers, as: :json
-        end.to change(user.notebooks, :count).by(1)
-      end
+              params: valid_attributes, headers: valid_headers, as: :json
 
-      it 'renders a JSON response with the new notebook' do
-        post api_v1_notebooks_url,
-             params: valid_attributes, headers: valid_headers, as: :json
-
-        expect(response).to have_http_status(:created)
-        expect(response.content_type).to match(a_string_including('application/json'))
+          expect(response).to have_http_status(:created)
+          expect(response.content_type).to match(a_string_including('application/json'))
+        end
       end
     end
 
     context 'with invalid parameters' do
+      before do
+        post user_session_url, as: :json, params: { user: { email: user.email, password: 'superSecret123!' } }
+      end
+
       it 'does not create a new Notebook' do
         expect do
           post api_v1_notebooks_url,
@@ -125,27 +147,37 @@ RSpec.describe '/api/v1/notebooks', type: :request do
         expect(response.body).to include('Not Authenticated')
       end
 
-      it 'updates the requested notebook' do
-        expect do
+      context 'when signed in' do
+        before do
+          post user_session_url, as: :json, params: { user: { email: user.email, password: 'superSecret123!' } }
+        end
+
+        it 'updates the requested notebook' do
+          expect do
+            patch api_v1_notebook_url(existing_notebook),
+                  params: new_attributes, headers: valid_headers, as: :json
+          end.to change(Notebook, :count).by(0)
+
+          existing_notebook.reload
+          expect(existing_notebook.name).to eql('Updated Notebook')
+          expect(existing_notebook.summary).to eql('Updated Summary')
+        end
+
+        it 'renders a JSON response with the notebook' do
           patch api_v1_notebook_url(existing_notebook),
                 params: new_attributes, headers: valid_headers, as: :json
-        end.to change(Notebook, :count).by(0)
 
-        existing_notebook.reload
-        expect(existing_notebook.name).to eql('Updated Notebook')
-        expect(existing_notebook.summary).to eql('Updated Summary')
-      end
-
-      it 'renders a JSON response with the notebook' do
-        patch api_v1_notebook_url(existing_notebook),
-              params: new_attributes, headers: valid_headers, as: :json
-
-        expect(response).to have_http_status(:ok)
-        expect(response.content_type).to eq('application/json; charset=utf-8')
+          expect(response).to have_http_status(:ok)
+          expect(response.content_type).to eq('application/json; charset=utf-8')
+        end
       end
     end
 
     context 'with invalid parameters' do
+      before do
+        post user_session_url, as: :json, params: { user: { email: user.email, password: 'superSecret123!' } }
+      end
+
       it 'renders a JSON response with errors for the notebook' do
         patch api_v1_notebook_url(existing_notebook),
               params: invalid_attributes, headers: valid_headers, as: :json
@@ -170,10 +202,16 @@ RSpec.describe '/api/v1/notebooks', type: :request do
       expect(response.body).to include('Not Authenticated')
     end
 
-    it 'destroys the requested notebook' do
-      expect do
-        delete api_v1_notebook_url(existing_notebook), headers: valid_headers, as: :json
-      end.to change(user.notebooks, :count).by(-1)
+    context 'when signed in' do
+      before do
+        post user_session_url, as: :json, params: { user: { email: user.email, password: 'superSecret123!' } }
+      end
+
+      it 'destroys the requested notebook' do
+        expect do
+          delete api_v1_notebook_url(existing_notebook), headers: valid_headers, as: :json
+        end.to change(user.notebooks, :count).by(-1)
+      end
     end
   end
 end

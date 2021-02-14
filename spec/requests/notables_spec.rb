@@ -196,6 +196,10 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
       end
 
       context 'with invalid parameters' do
+        before do
+          post user_session_url, as: :json, params: { user: { email: user.email, password: 'superSecret123!' } }
+        end
+
         it 'does not create a new notable' do
           expect do
             post api_v1_notebook_notables_url(notebook_1),
