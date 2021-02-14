@@ -8,14 +8,6 @@ RSpec.describe 'devise/registrations', type: :request do
   let!(:valid_attributes) { FactoryBot.attributes_for(:user, display_name: 'Test Display Name') }
   let!(:invalid_attributes) { FactoryBot.attributes_for(:user, email: 'Invalid') }
 
-  # This should return the minimal set of values that should be in the headers
-  # in order to pass any filters (e.g. authentication) defined in
-  # RegistrationsController, or in your router and rack
-  # middleware. Be sure to keep this updated too.
-  let(:valid_headers) do
-    { Authorization: "Token #{existing_user.generate_jwt}" }
-  end
-
   describe 'POST /create' do
     context 'with valid parameters' do
       it 'is permitted when not signed in' do
