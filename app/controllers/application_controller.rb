@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::API
+  include ::ActionController::Cookies
   include ActionController::HttpAuthentication::Token::ControllerMethods
   respond_to :json
 
@@ -14,15 +15,14 @@ class ApplicationController < ActionController::API
   end
 
   def authenticate_user
-    render json: { errors: ['Not Authenticated'] }, status: :unauthorized && return unless request.headers['Authorization'].present?
+    render json: { errors: ['Not Authenticated'] }, status: :unauthorized && return unless cookies.signed[:token].present?
 
-    authenticate_or_request_with_http_token do |token|
-      jwt_payload = JWT.decode(token, Rails.application.secrets.secret_key_base || ENV['SECRET_KEY_BASE']).first
+    token = cookies.signed[:token]
+    jwt_payload = JWT.decode(token, Rails.application.secrets.secret_key_base || ENV['SECRET_KEY_BASE']).first
 
-      @current_user_id = jwt_payload['id']
-    rescue JWT::ExpiredSignature, JWT::VerificationError, JWT::DecodeError
-      render json: { errors: ['Not Authenticated'] }, status: :unauthorized
-    end
+    @current_user_id = jwt_payload['id']
+  rescue JWT::ExpiredSignature, JWT::VerificationError, JWT::DecodeError
+    render json: { errors: ['Not Authenticated'] }, status: :unauthorized
   end
 
   def authenticate_user!(_options = {})
