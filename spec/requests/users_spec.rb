@@ -22,17 +22,21 @@ RSpec.describe '/api/v1/users', type: :request do
       expect(response.body).to include('Not Authenticated')
     end
 
-    it 'renders a successful response when note is linked to given notebook' do
-      get api_v1_user_url(user_1.id), headers: valid_headers, as: :json
+  context 'when signed in' do
+    before do
+      post user_session_url, as: :json, params: { user: { email: user_1.email, password: 'superSecret123!' } }
+    end
 
-      expect(response).to be_successful
-      expect(response.body).to include(user_1.display_name)
-      expect(response.body).to include(user_1.email)
-      expect(response.body).to include(user_1.generate_jwt)
+      it 'renders a successful response when note is linked to given notebook' do
+        get api_v1_user_url(user_1.id), headers: valid_headers, as: :json
 
-      expect(response.body).not_to include(user_2.display_name)
-      expect(response.body).not_to include(user_2.email)
-      expect(response.body).not_to include(user_2.generate_jwt)
+        expect(response).to be_successful
+        expect(response.body).to include(user_1.display_name)
+        expect(response.body).to include(user_1.email)
+
+        expect(response.body).not_to include(user_2.display_name)
+        expect(response.body).not_to include(user_2.email)
+      end
     end
   end
 
@@ -54,28 +58,38 @@ RSpec.describe '/api/v1/users', type: :request do
         expect(response.body).to include('Not Authenticated')
       end
 
-      it 'updates the requested user' do
-        expect do
+      context 'when signed in' do
+        before do
+          post user_session_url, as: :json, params: { user: { email: user_1.email, password: 'superSecret123!' } }
+        end
+
+        it 'updates the requested user' do
+          expect do
+            patch api_v1_user_url(user_1),
+                  params: new_attributes, headers: valid_headers, as: :json
+          end.to change(User, :count).by(0)
+
+          user_1.reload
+          expect(user_1.display_name).to eql(new_attributes[:display_name])
+          expect(user_1.email).to eql(new_attributes[:email])
+        end
+
+        it 'renders a JSON response with the user' do
           patch api_v1_user_url(user_1),
                 params: new_attributes, headers: valid_headers, as: :json
-        end.to change(User, :count).by(0)
 
-        user_1.reload
-        expect(user_1.display_name).to eql(new_attributes[:display_name])
-        expect(user_1.email).to eql(new_attributes[:email])
-      end
-
-      it 'renders a JSON response with the user' do
-        patch api_v1_user_url(user_1),
-              params: new_attributes, headers: valid_headers, as: :json
-
-        expect(response).to have_http_status(:ok)
-        expect(response.content_type).to eq('application/json; charset=utf-8')
+          expect(response).to have_http_status(:ok)
+          expect(response.content_type).to eq('application/json; charset=utf-8')
+        end
       end
     end
 
     context 'with invalid parameters' do
       let(:invalid_attributes) { FactoryBot.attributes_for(:user, email: '-') }
+
+      before do
+        post user_session_url, as: :json, params: { user: { email: user_1.email, password: 'superSecret123!' } }
+      end
 
       it 'renders a JSON response with errors for the notebook' do
         patch api_v1_user_url(user_1),
