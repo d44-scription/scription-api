@@ -10,14 +10,6 @@ RSpec.describe '/api/v1/notebooks', type: :request do
   let(:valid_attributes) { FactoryBot.attributes_for(:notebook, user: user) }
   let(:invalid_attributes) { FactoryBot.attributes_for(:notebook, user: user, name: '0' * 46) }
 
-  # This should return the minimal set of values that should be in the headers
-  # in order to pass any filters (e.g. authentication) defined in
-  # NotebooksController, or in your router and rack
-  # middleware. Be sure to keep this updated too.
-  let(:valid_headers) do
-    { Authorization: "Token #{user.generate_jwt}" }
-  end
-
   describe 'GET /index' do
     it 'is prohibited when not signed in' do
       get api_v1_notebooks_url, as: :json
@@ -32,7 +24,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
       end
 
       it 'renders a successful response' do
-        get api_v1_notebooks_url, headers: valid_headers, as: :json
+        get api_v1_notebooks_url, as: :json
 
         expect(response).to be_successful
         expect(response.body).to include(existing_notebook.name)
@@ -62,7 +54,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
       end
 
       it 'renders a successful response' do
-        get api_v1_notebook_url(existing_notebook), headers: valid_headers, as: :json
+        get api_v1_notebook_url(existing_notebook), as: :json
 
         expect(response).to be_successful
         expect(response.body).to include(existing_notebook.name)
@@ -91,13 +83,13 @@ RSpec.describe '/api/v1/notebooks', type: :request do
         it 'creates a new Notebook' do
           expect do
             post api_v1_notebooks_url,
-                params: valid_attributes, headers: valid_headers, as: :json
+                params: valid_attributes, as: :json
           end.to change(user.notebooks, :count).by(1)
         end
 
         it 'renders a JSON response with the new notebook' do
           post api_v1_notebooks_url,
-              params: valid_attributes, headers: valid_headers, as: :json
+              params: valid_attributes, as: :json
 
           expect(response).to have_http_status(:created)
           expect(response.content_type).to match(a_string_including('application/json'))
@@ -119,7 +111,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
 
       it 'renders a JSON response with errors for the new notebook' do
         post api_v1_notebooks_url,
-             params: invalid_attributes, headers: valid_headers, as: :json
+             params: invalid_attributes, as: :json
 
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json; charset=utf-8')
@@ -155,7 +147,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
         it 'updates the requested notebook' do
           expect do
             patch api_v1_notebook_url(existing_notebook),
-                  params: new_attributes, headers: valid_headers, as: :json
+                  params: new_attributes, as: :json
           end.to change(Notebook, :count).by(0)
 
           existing_notebook.reload
@@ -165,7 +157,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
 
         it 'renders a JSON response with the notebook' do
           patch api_v1_notebook_url(existing_notebook),
-                params: new_attributes, headers: valid_headers, as: :json
+                params: new_attributes, as: :json
 
           expect(response).to have_http_status(:ok)
           expect(response.content_type).to eq('application/json; charset=utf-8')
@@ -180,7 +172,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
 
       it 'renders a JSON response with errors for the notebook' do
         patch api_v1_notebook_url(existing_notebook),
-              params: invalid_attributes, headers: valid_headers, as: :json
+              params: invalid_attributes, as: :json
 
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json; charset=utf-8')
@@ -209,7 +201,7 @@ RSpec.describe '/api/v1/notebooks', type: :request do
 
       it 'destroys the requested notebook' do
         expect do
-          delete api_v1_notebook_url(existing_notebook), headers: valid_headers, as: :json
+          delete api_v1_notebook_url(existing_notebook), as: :json
         end.to change(user.notebooks, :count).by(-1)
       end
     end
