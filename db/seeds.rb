@@ -5,27 +5,25 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+puts("Creating User")
+user = User.create(email: 'admin@example.com', password: 'superSecret123!', password_confirmation: 'superSecret123!')
+
 3.times do |i|
-  puts("Creating notebook #{i}")
-  n = Notebook.create!(name: "Notebook #{i}", summary: "This here is a brief summary for notebook #{i}")
+  puts("  Creating notebook #{i}")
+  notebook = user.notebooks.create!(name: "Notebook #{i}", summary: "This here is a brief summary for notebook #{i}")
 
-  puts("  Creating notes for #{n.name}")
-  3.times do |j|
-    n.notes.create!(content: "Test note #{i} - #{j}")
-  end
+  puts("    Creating item for #{notebook.name}")
+  item = notebook.items.create!(name: "Item #{i}")
 
-  puts("  Creating items for #{n.name}")
-  3.times do |j|
-    n.items.create!(name: "Item #{i}:#{j}")
-  end
+  puts("    Creating character for #{notebook.name}")
+  character = notebook.characters.create!(name: "Character #{i}")
 
-  puts("  Creating characters for #{n.name}")
-  3.times do |j|
-    n.characters.create!(name: "Character #{i}:#{j}")
-  end
+  puts("    Creating location for #{notebook.name}")
+  location = notebook.locations.create!(name: "Location #{i}")
 
-  puts("  Creating locations for #{n.name}")
-  3.times do |j|
-    n.locations.create!(name: "Location #{i}:#{j}")
-  end
+  puts("    Creating linked notes for #{notebook.name}")
+  notebook.notes.create!(content: "Test note #{i}. #{item.text_code} is owned by #{character.text_code}")
+  notebook.notes.create!(content: "Test note #{i}. #{character.text_code} lives in #{location.text_code}")
+  notebook.notes.create!(content: "Test note #{i}. #{item.text_code} is found in #{location.text_code}")
+  notebook.notes.create!(content: "Test note #{i}. #{character.text_code} found #{item.text_code} in #{location.text_code}")
 end
