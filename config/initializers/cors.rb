@@ -7,7 +7,7 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins 'localhost:3001', 'scription-app-staging.herokuapp.com', 'scription-app.herokuapp.com'
+    origins ENV['CORS_ORIGIN']
 
     resource '*',
     headers: :any,

@@ -26,6 +26,7 @@ services:
       - RACK_ENV=development
       - POSTGRES_USER=rails
       - POSTGRES_PASSWORD=secret123
+      - CORS_ORIGIN=localhost:3001
     volumes:
       - .:/usr/src/app
     depends_on:
