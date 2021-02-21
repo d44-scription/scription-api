@@ -6,7 +6,7 @@ RSpec.describe 'devise/registrations', type: :request do
   let!(:existing_user) { FactoryBot.create(:user) }
 
   let!(:valid_attributes) { FactoryBot.attributes_for(:user, display_name: 'Test Display Name') }
-  let!(:invalid_attributes) { FactoryBot.attributes_for(:user, email: 'Invalid') }
+  let!(:invalid_attributes) { FactoryBot.attributes_for(:user, email: 'Invalid', password: nil) }
 
   describe 'POST /create' do
     context 'with valid parameters' do
@@ -43,9 +43,8 @@ RSpec.describe 'devise/registrations', type: :request do
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json; charset=utf-8')
 
-        expect(response.body).to include('email')
-        expect(response.body).not_to include('password')
-        expect(response.body).to include('is invalid')
+        expect(response.body).to include('Email is invalid')
+        expect(response.body).to include('Password can\'t be blank')
       end
     end
   end
