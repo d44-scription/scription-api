@@ -8,6 +8,8 @@ module Api
 
       def index
         @notables = @notebook.notables.order(:order_index)
+
+        @notables = @notables.where('UPPER("name") LIKE ?', "%#{params[:q].upcase}%") if params[:q]
       end
 
       def notes
