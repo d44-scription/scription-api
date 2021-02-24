@@ -6,9 +6,9 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
   let!(:user) { FactoryBot.create(:user) }
   let!(:notebook_1) { FactoryBot.create(:notebook, user: user) }
 
-  let!(:item) { FactoryBot.create(:item, notebook: notebook_1, name: 'Item') }
-  let!(:character) { FactoryBot.create(:item, notebook: notebook_1, name: 'Character') }
-  let!(:location) { FactoryBot.create(:item, notebook: notebook_1, name: 'Location') }
+  let!(:item) { FactoryBot.create(:item, notebook: notebook_1, name: 'Item 1') }
+  let!(:character) { FactoryBot.create(:item, notebook: notebook_1, name: 'Character 1') }
+  let!(:location) { FactoryBot.create(:item, notebook: notebook_1, name: 'Location 1') }
 
   let(:item_attributes) { FactoryBot.attributes_for(:item, notebook: notebook_1) }
   let(:character_attributes) { FactoryBot.attributes_for(:character, notebook: notebook_1) }
@@ -49,6 +49,47 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
         expect(response.body).not_to include(item_attributes[:name])
         expect(response.body).not_to include(character_attributes[:name])
         expect(response.body).not_to include(location_attributes[:name])
+      end
+
+      describe 'when searching' do
+        it 'returns a subset of notables matching the search query' do
+          get api_v1_notebook_notables_url(notebook_1, q: 'A'), as: :json
+
+          expect(response).to be_successful
+          expect(response.body).not_to include(item.name)
+          expect(response.body).to include(character.name)
+          expect(response.body).to include(location.name)
+        end
+
+        it 'returns an empty array when no notables match the query' do
+          get api_v1_notebook_notables_url(notebook_1, q: 'TEST'), as: :json
+
+          expect(response).to be_successful
+
+          expect(response.body).to eql("[]")
+
+          expect(response.body).not_to include(item.name)
+          expect(response.body).not_to include(character.name)
+          expect(response.body).not_to include(location.name)
+        end
+
+        it 'returns all notables when all match the query' do
+          get api_v1_notebook_notables_url(notebook_1, q: ' 1'), as: :json
+
+          expect(response).to be_successful
+          expect(response.body).to include(item.name)
+          expect(response.body).to include(character.name)
+          expect(response.body).to include(location.name)
+        end
+
+        it 'ignores case when searching' do
+          get api_v1_notebook_notables_url(notebook_1, q: 'iTeM'), as: :json
+
+          expect(response).to be_successful
+          expect(response.body).to include(item.name)
+          expect(response.body).not_to include(character.name)
+          expect(response.body).not_to include(location.name)
+        end
       end
     end
   end
@@ -279,7 +320,7 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
         expect(response.content_type).to eq('application/json; charset=utf-8')
 
         item.reload
-        expect(item.name).to eql('Item')
+        expect(item.name).to eql('Item 1')
 
         expect(response.body).to include('Type must be one of Item/Character/Location')
       end
