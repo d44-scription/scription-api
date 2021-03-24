@@ -11,7 +11,7 @@ module Api
       end
 
       def unlinked
-        @notes = @notebook.notes.where.missing(:notables)
+        @notes = @notebook.notes.where.missing(:notables).order(:order_index)
       end
 
       def create
