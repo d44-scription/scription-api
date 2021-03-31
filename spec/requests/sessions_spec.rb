@@ -23,7 +23,6 @@ RSpec.describe 'devise/sessions', type: :request do
         expect(response).to be_successful
         expect(response.body).to include(notebook.name)
         expect(response.body).to include(notebook.summary)
-        expect(response.body).to include(notebook.order_index.to_s)
       end
     end
 
@@ -91,7 +90,6 @@ RSpec.describe 'devise/sessions', type: :request do
       expect(response).to be_successful
       expect(response.body).to include(notebook.name)
       expect(response.body).to include(notebook.summary)
-      expect(response.body).to include(notebook.order_index.to_s)
 
       delete destroy_user_session_url, as: :json
 
