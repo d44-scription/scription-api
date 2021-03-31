@@ -17,7 +17,11 @@ module Api
       end
 
       def recents
-        @notables = @notebook.notables.order(updated_at: :desc).first(5)
+        @notables = @notebook.notables.order(viewed_at: :desc).first(5)
+      end
+
+      def show
+        @notable.update(viewed_at: DateTime.now)
       end
 
       def create

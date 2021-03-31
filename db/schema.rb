@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_09_100920) do
+ActiveRecord::Schema.define(version: 2021_03_31_102644) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(version: 2021_02_09_100920) do
     t.datetime "updated_at", precision: 6, null: false
     t.text "description"
     t.integer "order_index"
+    t.datetime "viewed_at", default: "2021-03-31 10:36:42"
     t.index ["notebook_id"], name: "index_notables_on_notebook_id"
   end
 
