@@ -63,6 +63,20 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
         expect(json.third['name']).to eql(location.name)
       end
 
+      it 'does not update the viewed_at date of the notable' do
+        date = item.viewed_at
+
+        get api_v1_notebook_notables_url(notebook_1), as: :json
+
+        expect(response).to be_successful
+        expect(response.body).to include(item.name)
+        expect(response.body).to include(character.name)
+        expect(response.body).to include(location.name)
+
+        item.reload
+        expect(item.viewed_at).to eql(date)
+      end
+
       describe 'when searching' do
         it 'returns a subset of notables matching the search query' do
           get api_v1_notebook_notables_url(notebook_1, q: 'A'), as: :json
