@@ -78,7 +78,7 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
 
           expect(response).to be_successful
 
-          expect(response.body).to eql("[]")
+          expect(response.body).to eql('[]')
 
           expect(response.body).not_to include(item.name)
           expect(response.body).not_to include(character.name)
