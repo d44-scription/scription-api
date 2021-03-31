@@ -7,7 +7,7 @@ module Api
       before_action :fetch_notable, only: %i[notes show update destroy]
 
       def index
-        @notables = @notebook.notables.order(:order_index)
+        @notables = @notebook.notables.order(:name)
 
         @notables = @notables.where('UPPER("name") LIKE ?', "%#{params[:q].upcase}%") if params[:q]
       end
