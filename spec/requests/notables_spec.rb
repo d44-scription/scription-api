@@ -158,6 +158,19 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
         expect(json.second['content']).to eql(note_3.content)
         expect(json.third['content']).to eql(note_1.content)
       end
+
+      it 'updates the viewed_at date of the notable' do
+        date = item.viewed_at
+
+        get notes_api_v1_notebook_notable_url(notebook_1, item), as: :json
+
+        expect(response).to be_successful
+        expect(response.body).to include(note_1.content)
+        expect(response.body).to include(note_2.content)
+
+        item.reload
+        expect(item.viewed_at).not_to eql(date)
+      end
     end
   end
 
@@ -360,6 +373,21 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
 
           expect(response).to have_http_status(:ok)
           expect(response.content_type).to eq('application/json; charset=utf-8')
+        end
+
+        it 'updates the viewed_at date of the notable' do
+          date = item.viewed_at
+
+          expect do
+            patch api_v1_notebook_notable_url(notebook_1, item),
+                  params: new_attributes, as: :json
+          end.to change(notebook_1.items, :count).by(0)
+
+          expect(response).to have_http_status(:ok)
+          expect(response.content_type).to eq('application/json; charset=utf-8')
+
+          item.reload
+          expect(item.viewed_at).not_to eql(date)
         end
       end
     end

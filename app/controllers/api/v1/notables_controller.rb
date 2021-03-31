@@ -5,6 +5,7 @@ module Api
     class NotablesController < ApiController
       before_action :fetch_notebook
       before_action :fetch_notable, only: %i[notes show update destroy]
+      before_action :view_notable, only: %i[notes show update]
 
       def index
         @notables = @notebook.notables.order(:name)
@@ -18,10 +19,6 @@ module Api
 
       def recents
         @notables = @notebook.notables.order(viewed_at: :desc).first(5)
-      end
-
-      def show
-        @notable.update(viewed_at: DateTime.now)
       end
 
       def create
@@ -54,6 +51,10 @@ module Api
 
       def fetch_notable
         @notable = @notebook.notables.find(params[:id])
+      end
+
+      def view_notable
+        @notable.update(viewed_at: DateTime.now)
       end
 
       def notable_params
