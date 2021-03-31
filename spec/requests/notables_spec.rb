@@ -48,6 +48,21 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
         expect(response.body).not_to include(location_attributes[:name])
       end
 
+      it 'retrieves notables in alphabetical order' do
+        get api_v1_notebook_notables_url(notebook_1), as: :json
+
+        expect(response).to be_successful
+        expect(response.body).to include(item.name)
+        expect(response.body).to include(character.name)
+        expect(response.body).to include(location.name)
+
+        json = JSON.parse(response.body)
+
+        expect(json.first['name']).to eql(character.name)
+        expect(json.second['name']).to eql(item.name)
+        expect(json.third['name']).to eql(location.name)
+      end
+
       describe 'when searching' do
         it 'returns a subset of notables matching the search query' do
           get api_v1_notebook_notables_url(notebook_1, q: 'A'), as: :json
@@ -164,7 +179,7 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
         post user_session_url, as: :json, params: { user: { email: user.email, password: 'superSecret123!' } }
       end
 
-      it 'retrieves notes in order of access' do
+      it 'retrieves notables in order of recency' do
         get recents_api_v1_notebook_notables_path(notebook_1), as: :json
 
         expect(response).to be_successful

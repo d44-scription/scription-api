@@ -6,7 +6,7 @@ module Api
       before_action :fetch_notebook
 
       def index
-        @characters = @notebook.characters.order(:order_index)
+        @characters = @notebook.characters.order(:name)
 
         @characters = @characters.where('UPPER("name") LIKE ?', "%#{params[:q].upcase}%") if params[:q]
       end

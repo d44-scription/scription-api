@@ -4,10 +4,9 @@ module Api
   module V1
     class NotebooksController < ApiController
       before_action :fetch_notebook, only: %i[show update destroy]
-      # skip_before_action :authenticate_user!, only: %i[index]
 
       def index
-        @notebooks = current_user.notebooks.order(:order_index)
+        @notebooks = current_user.notebooks.order(:name)
       end
 
       def create
