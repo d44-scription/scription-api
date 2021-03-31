@@ -4,6 +4,7 @@ FactoryBot.define do
   factory :notable do
     sequence(:name) { |n| "Noteable #{n}" }
     description { 'Description of notable' }
+    viewed_at { DateTime.new(1970, 1, 1) }
     notebook
 
     factory :item, class: Item do
