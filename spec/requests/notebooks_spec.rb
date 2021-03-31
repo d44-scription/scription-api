@@ -29,7 +29,6 @@ RSpec.describe '/api/v1/notebooks', type: :request do
         expect(response).to be_successful
         expect(response.body).to include(existing_notebook.name)
         expect(response.body).to include(existing_notebook.summary)
-        expect(response.body).to include(existing_notebook.order_index.to_s)
 
         # Confirm response is scoped to current user & only includes created books
         expect(response.body).not_to include(valid_attributes[:name])

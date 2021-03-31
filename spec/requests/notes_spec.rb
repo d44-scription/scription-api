@@ -35,10 +35,8 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
 
         expect(response).to be_successful
         expect(response.body).to include(note_1.content)
-        expect(response.body).to include(note_1.order_index.to_s)
 
         expect(response.body).to include(note_3.content)
-        expect(response.body).to include(note_3.order_index.to_s)
 
         expect(response.body).not_to include(note_2.content)
         expect(response.body).not_to include(valid_attributes[:content])
@@ -79,7 +77,6 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
 
         expect(response).to be_successful
         expect(response.body).to include(note_1.content)
-        expect(response.body).to include(note_1.order_index.to_s)
 
         expect(response.body).not_to include(note_3.content)
         expect(response.body).not_to include(note_2.content)
