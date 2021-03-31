@@ -16,6 +16,10 @@ module Api
         @notes = @notable.notes.order(:order_index).uniq
       end
 
+      def recents
+        @notables = @notebook.notables.order(updated_at: :desc).first(5)
+      end
+
       def create
         @notable = @notebook.notables.new(notable_params)
 

@@ -24,6 +24,10 @@ Rails.application.routes.draw do
           member do
             get :notes
           end
+
+          collection do
+            get :recents
+          end
         end
       end
     end
