@@ -146,6 +146,41 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
     end
   end
 
+  describe 'GET /recents' do
+    before do
+      character.update(viewed_at: DateTime.new(2013, 1, 31))
+      location.update(viewed_at: DateTime.new(2000, 1, 1))
+    end
+
+    it 'is prohibited when not signed in' do
+      get recents_api_v1_notebook_notables_path(notebook_1), as: :json
+
+      expect(response).to be_unauthorized
+      expect(response.body).to include('Not Authenticated')
+    end
+
+    context 'when signed in' do
+      before do
+        post user_session_url, as: :json, params: { user: { email: user.email, password: 'superSecret123!' } }
+      end
+
+      it 'retrieves notes in order of access' do
+        get recents_api_v1_notebook_notables_path(notebook_1), as: :json
+
+        expect(response).to be_successful
+        expect(response.body).to include(item.name)
+        expect(response.body).to include(character.name)
+        expect(response.body).to include(location.name)
+
+        json = JSON.parse(response.body)
+
+        expect(json.first['name']).to eql(character.name)
+        expect(json.second['name']).to eql(location.name)
+        expect(json.third['name']).to eql(item.name)
+      end
+    end
+  end
+
   describe 'GET /show' do
     it 'is prohibited when not signed in' do
       get api_v1_notebook_notable_url(notebook_1, item), as: :json
@@ -173,6 +208,18 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
         expect(response.body).not_to include(item_attributes[:name])
         expect(response.body).not_to include(character_attributes[:name])
         expect(response.body).not_to include(location_attributes[:name])
+      end
+
+      it 'updates the viewed_at date of the notable' do
+        date = item.viewed_at
+
+        get api_v1_notebook_notable_url(notebook_1, item), as: :json
+
+        expect(response).to be_successful
+        expect(response.body).to include(item.name)
+
+        item.reload
+        expect(item.viewed_at).not_to eql(date)
       end
     end
   end

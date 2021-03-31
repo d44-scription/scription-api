@@ -16,6 +16,14 @@ module Api
         @notes = @notable.notes.order(:order_index).uniq
       end
 
+      def recents
+        @notables = @notebook.notables.order(viewed_at: :desc).first(5)
+      end
+
+      def show
+        @notable.update(viewed_at: DateTime.now)
+      end
+
       def create
         @notable = @notebook.notables.new(notable_params)
 
