@@ -4,9 +4,10 @@ require 'rails_helper'
 
 RSpec.describe '/api/v1/notebooks', type: :request do
   let!(:user) { FactoryBot.create(:user) }
-  let!(:existing_notebook) { FactoryBot.create(:notebook, user: user) }
-  let!(:existing_notebook_2) { FactoryBot.create(:notebook) }
+  let!(:existing_notebook) { FactoryBot.create(:notebook, user: user, name: 'zz_Notebook') }
+  let!(:existing_notebook_2) { FactoryBot.create(:notebook, user: user, name: 'aa_Notebook') }
 
+  let!(:other_users_notebook) { FactoryBot.create(:notebook) }
   let(:valid_attributes) { FactoryBot.attributes_for(:notebook, user: user) }
   let(:invalid_attributes) { FactoryBot.attributes_for(:notebook, user: user, name: '0' * 46) }
 
@@ -30,9 +31,28 @@ RSpec.describe '/api/v1/notebooks', type: :request do
         expect(response.body).to include(existing_notebook.name)
         expect(response.body).to include(existing_notebook.summary)
 
+        expect(response.body).to include(existing_notebook_2.name)
+        expect(response.body).to include(existing_notebook_2.summary)
+
         # Confirm response is scoped to current user & only includes created books
         expect(response.body).not_to include(valid_attributes[:name])
-        expect(response.body).not_to include(existing_notebook_2.name)
+        expect(response.body).not_to include(other_users_notebook.name)
+      end
+
+      it 'retrieves notebooks sorted alphabetically' do
+        get api_v1_notebooks_url, as: :json
+
+        expect(response).to be_successful
+        expect(response.body).to include(existing_notebook.name)
+        expect(response.body).to include(existing_notebook.summary)
+
+        expect(response.body).to include(existing_notebook_2.name)
+        expect(response.body).to include(existing_notebook_2.summary)
+
+        json = JSON.parse(response.body)
+
+        expect(json.first['name']).to eql(existing_notebook_2.name)
+        expect(json.second['name']).to eql(existing_notebook.name)
       end
     end
   end
