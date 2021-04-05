@@ -37,11 +37,8 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
 
         expect(response).to be_successful
         expect(response.body).to include(item.name)
-        expect(response.body).to include(item.order_index.to_s)
         expect(response.body).to include(character.name)
-        expect(response.body).to include(character.order_index.to_s)
         expect(response.body).to include(location.name)
-        expect(response.body).to include(location.order_index.to_s)
 
         expect(response.body).to include('type')
 
@@ -49,6 +46,35 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
         expect(response.body).not_to include(item_attributes[:name])
         expect(response.body).not_to include(character_attributes[:name])
         expect(response.body).not_to include(location_attributes[:name])
+      end
+
+      it 'retrieves notables in alphabetical order' do
+        get api_v1_notebook_notables_url(notebook_1), as: :json
+
+        expect(response).to be_successful
+        expect(response.body).to include(item.name)
+        expect(response.body).to include(character.name)
+        expect(response.body).to include(location.name)
+
+        json = JSON.parse(response.body)
+
+        expect(json.first['name']).to eql(character.name)
+        expect(json.second['name']).to eql(item.name)
+        expect(json.third['name']).to eql(location.name)
+      end
+
+      it 'does not update the viewed_at date of the notable' do
+        date = item.viewed_at
+
+        get api_v1_notebook_notables_url(notebook_1), as: :json
+
+        expect(response).to be_successful
+        expect(response.body).to include(item.name)
+        expect(response.body).to include(character.name)
+        expect(response.body).to include(location.name)
+
+        item.reload
+        expect(item.viewed_at).to eql(date)
       end
 
       describe 'when searching' do
@@ -66,7 +92,7 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
 
           expect(response).to be_successful
 
-          expect(response.body).to eql("[]")
+          expect(response.body).to eql('[]')
 
           expect(response.body).not_to include(item.name)
           expect(response.body).not_to include(character.name)
@@ -146,6 +172,54 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
         expect(json.second['content']).to eql(note_3.content)
         expect(json.third['content']).to eql(note_1.content)
       end
+
+      it 'updates the viewed_at date of the notable' do
+        date = item.viewed_at
+
+        get notes_api_v1_notebook_notable_url(notebook_1, item), as: :json
+
+        expect(response).to be_successful
+        expect(response.body).to include(note_1.content)
+        expect(response.body).to include(note_2.content)
+
+        item.reload
+        expect(item.viewed_at).not_to eql(date)
+      end
+    end
+  end
+
+  describe 'GET /recents' do
+    before do
+      character.update(viewed_at: DateTime.new(2013, 1, 31))
+      location.update(viewed_at: DateTime.new(2000, 1, 1))
+    end
+
+    it 'is prohibited when not signed in' do
+      get recents_api_v1_notebook_notables_path(notebook_1), as: :json
+
+      expect(response).to be_unauthorized
+      expect(response.body).to include('Not Authenticated')
+    end
+
+    context 'when signed in' do
+      before do
+        post user_session_url, as: :json, params: { user: { email: user.email, password: 'superSecret123!' } }
+      end
+
+      it 'retrieves notables in order of recency' do
+        get recents_api_v1_notebook_notables_path(notebook_1), as: :json
+
+        expect(response).to be_successful
+        expect(response.body).to include(item.name)
+        expect(response.body).to include(character.name)
+        expect(response.body).to include(location.name)
+
+        json = JSON.parse(response.body)
+
+        expect(json.first['name']).to eql(character.name)
+        expect(json.second['name']).to eql(location.name)
+        expect(json.third['name']).to eql(item.name)
+      end
     end
   end
 
@@ -176,6 +250,18 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
         expect(response.body).not_to include(item_attributes[:name])
         expect(response.body).not_to include(character_attributes[:name])
         expect(response.body).not_to include(location_attributes[:name])
+      end
+
+      it 'updates the viewed_at date of the notable' do
+        date = item.viewed_at
+
+        get api_v1_notebook_notable_url(notebook_1, item), as: :json
+
+        expect(response).to be_successful
+        expect(response.body).to include(item.name)
+
+        item.reload
+        expect(item.viewed_at).not_to eql(date)
       end
     end
   end
@@ -301,6 +387,21 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
 
           expect(response).to have_http_status(:ok)
           expect(response.content_type).to eq('application/json; charset=utf-8')
+        end
+
+        it 'updates the viewed_at date of the notable' do
+          date = item.viewed_at
+
+          expect do
+            patch api_v1_notebook_notable_url(notebook_1, item),
+                  params: new_attributes, as: :json
+          end.to change(notebook_1.items, :count).by(0)
+
+          expect(response).to have_http_status(:ok)
+          expect(response.content_type).to eq('application/json; charset=utf-8')
+
+          item.reload
+          expect(item.viewed_at).not_to eql(date)
         end
       end
     end

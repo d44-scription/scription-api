@@ -8,8 +8,8 @@ RSpec.describe 'devise/sessions', type: :request do
 
   describe 'POST /create' do
     context 'with valid parameters' do
-      it 'renders a JSON response with the new session' do
-        post user_session_url, as: :json, params: { user: { email: user.email, password: 'superSecret123!' } }
+      it 'renders a JSON response with the new session, & accepts case-insensitive email' do
+        post user_session_url, as: :json, params: { user: { email: user.email.upcase, password: 'superSecret123!' } }
 
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to match(a_string_including('application/json'))
@@ -23,7 +23,6 @@ RSpec.describe 'devise/sessions', type: :request do
         expect(response).to be_successful
         expect(response.body).to include(notebook.name)
         expect(response.body).to include(notebook.summary)
-        expect(response.body).to include(notebook.order_index.to_s)
       end
     end
 
@@ -57,6 +56,21 @@ RSpec.describe 'devise/sessions', type: :request do
         expect(response).to be_unauthorized
         expect(response.body).to include('Not Authenticated')
       end
+
+      it 'does not create when password is case-insensitive' do
+        post user_session_url,
+             params: { user: { email: user.email, password: 'SUPERSECRET123!' } }, as: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.content_type).to match(a_string_including('application/json'))
+        expect(response.body).to include('Email or password is invalid')
+
+        # Forbid secure route
+        get api_v1_notebooks_url, as: :json
+
+        expect(response).to be_unauthorized
+        expect(response.body).to include('Not Authenticated')
+      end
     end
   end
 
@@ -76,7 +90,6 @@ RSpec.describe 'devise/sessions', type: :request do
       expect(response).to be_successful
       expect(response.body).to include(notebook.name)
       expect(response.body).to include(notebook.summary)
-      expect(response.body).to include(notebook.order_index.to_s)
 
       delete destroy_user_session_url, as: :json
 

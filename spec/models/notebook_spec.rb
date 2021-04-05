@@ -22,29 +22,6 @@ RSpec.describe Notebook, type: :model do
       expect(notebook).to be_valid
     end
 
-    it 'correctly sets order index when no other notebooks are available' do
-      expect(notebook.order_index).to be_nil
-
-      notebook.save
-
-      expect(notebook).to have(0).errors_on(:order_index)
-      expect(notebook.order_index).to eql(0)
-      expect(notebook).to be_valid
-    end
-
-    it 'correctly sets order index in sequence' do
-      notebook_2 = FactoryBot.create(:notebook)
-      expect(notebook.order_index).to be_nil
-      expect(notebook_2.order_index).to eql(0)
-
-      notebook.save
-
-      expect(notebook).to have(0).errors_on(:order_index)
-      expect(notebook.order_index).to eql(1)
-      expect(notebook_2.order_index).to eql(0)
-      expect(notebook).to be_valid
-    end
-
     it 'is not valid when no name provided' do
       notebook.name = nil
 

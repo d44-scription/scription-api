@@ -8,9 +8,11 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
   let!(:notebook_1) { FactoryBot.create(:notebook, user: user) }
   let!(:notebook_2) { FactoryBot.create(:notebook, user: user) }
 
+  let!(:item) { FactoryBot.create(:item, notebook: notebook_1, name: 'Item 1') }
+
   let!(:note_1) { FactoryBot.create(:note, notebook: notebook_1, content: 'Note 1') }
   let!(:note_2) { FactoryBot.create(:note, notebook: notebook_2, content: 'Note 2') }
-  let!(:note_3) { FactoryBot.create(:note, notebook: notebook_1, content: 'Note 3') }
+  let!(:note_3) { FactoryBot.create(:note, notebook: notebook_1, content: "Note 3 #{item.text_code}") }
 
   let(:valid_attributes) { FactoryBot.attributes_for(:note, notebook: notebook_1, content: 'New Note') }
   let(:invalid_attributes) { FactoryBot.attributes_for(:note, content: nil) }
@@ -33,10 +35,8 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
 
         expect(response).to be_successful
         expect(response.body).to include(note_1.content)
-        expect(response.body).to include(note_1.order_index.to_s)
 
         expect(response.body).to include(note_3.content)
-        expect(response.body).to include(note_3.order_index.to_s)
 
         expect(response.body).not_to include(note_2.content)
         expect(response.body).not_to include(valid_attributes[:content])
@@ -55,6 +55,47 @@ RSpec.describe '/api/v1/notebooks/:id/notes', type: :request do
 
         expect(json.first['content']).to eql(note_3.content)
         expect(json.second['content']).to eql(note_1.content)
+      end
+    end
+  end
+
+  describe 'GET /unlinked' do
+    it 'is prohibited when not signed in' do
+      get unlinked_api_v1_notebook_notes_path(notebook_1), as: :json
+
+      expect(response).to be_unauthorized
+      expect(response.body).to include('Not Authenticated')
+    end
+
+    context 'when signed in' do
+      before do
+        post user_session_url, as: :json, params: { user: { email: user.email, password: 'superSecret123!' } }
+      end
+
+      it 'ignores notes linked to a notable' do
+        get unlinked_api_v1_notebook_notes_path(notebook_1), as: :json
+
+        expect(response).to be_successful
+        expect(response.body).to include(note_1.content)
+
+        expect(response.body).not_to include(note_3.content)
+        expect(response.body).not_to include(note_2.content)
+        expect(response.body).not_to include(valid_attributes[:content])
+      end
+
+      it 'correctly sorts notes by order index' do
+        note_1.update(order_index: 50)
+
+        get unlinked_api_v1_notebook_notes_path(notebook_1), as: :json
+
+        expect(response).to be_successful
+        expect(response.body).to include(note_1.content)
+        expect(response.body).not_to include(note_2.content)
+        expect(response.body).not_to include(note_3.content)
+
+        json = JSON.parse(response.body)
+
+        expect(json.first['content']).to eql(note_1.content)
       end
     end
   end

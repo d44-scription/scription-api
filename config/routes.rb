@@ -10,14 +10,23 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :users, only: %i[show update]
       resources :notebooks do
-        resources :notes
         resources :items, only: %i[index]
         resources :characters, only: %i[index]
         resources :locations, only: %i[index]
 
+        resources :notes do
+          collection do
+            get :unlinked
+          end
+        end
+
         resources :notables do
           member do
             get :notes
+          end
+
+          collection do
+            get :recents
           end
         end
       end

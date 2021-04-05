@@ -10,6 +10,10 @@ module Api
         @notes = @notebook.notes.order(:order_index)
       end
 
+      def unlinked
+        @notes = @notebook.notes.where.missing(:notables).order(:order_index)
+      end
+
       def create
         @note = @notebook.notes.new(note_params)
 

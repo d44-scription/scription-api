@@ -42,8 +42,8 @@ RSpec.describe '/api/v1/notebooks/:id/items', type: :request do
         expect(response.body).not_to include(location.name)
       end
 
-      it 'correctly sorts items by order index' do
-        item_1.update(order_index: 50)
+      it 'correctly sorts items alphabetically' do
+        item_1.update(name: 'zz_item')
 
         get api_v1_notebook_items_url(notebook_1), as: :json
 
