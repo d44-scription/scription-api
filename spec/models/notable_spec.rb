@@ -24,6 +24,38 @@ RSpec.describe Notable, type: :model do
     end
   end
 
+  context 'when being destroyed' do
+    let!(:character) { FactoryBot.create(:item, notebook: notebook) }
+    let!(:location) { FactoryBot.create(:item, notebook: notebook) }
+    let!(:item) { FactoryBot.create(:item, notebook: notebook) }
+
+    let!(:note_1) { FactoryBot.create(:note, notebook: notebook, content: "#{item.text_code} #{location.text_code}") }
+    let!(:note_2) { FactoryBot.create(:note, notebook: notebook, content: "#{item.text_code} #{character.text_code}") }
+    let!(:note_3) { FactoryBot.create(:note, notebook: notebook, content: "#{location.text_code} #{character.text_code}") }
+
+    it 'destroys correctly' do
+      expect do
+        item.destroy
+      end.to change(notebook.notables, :count).by(-1)
+    end
+
+    it 'destroys linked notes' do
+      expect(item.notes.count).to eql(2)
+
+      expect do
+        item.destroy
+      end.to change(notebook.notes, :count).by(-2)
+    end
+
+    it 'destroys relationships for all deleted notes' do
+      expect(item.notes.count).to eql(2)
+
+      expect do
+        item.destroy
+      end.to change(NotableNote, :count).by(-4)
+    end
+  end
+
   context 'when an item' do
     let!(:item) { FactoryBot.build(:item, notebook: notebook) }
 
