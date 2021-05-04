@@ -10,10 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_31_114151) do
+ActiveRecord::Schema.define(version: 2021_05_04_093448) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "notable_notes", force: :cascade do |t|
+    t.bigint "notable_id", null: false
+    t.bigint "note_id", null: false
+    t.index ["notable_id"], name: "index_notable_notes_on_notable_id"
+    t.index ["note_id"], name: "index_notable_notes_on_note_id"
+  end
 
   create_table "notables", force: :cascade do |t|
     t.string "name"
@@ -24,13 +31,6 @@ ActiveRecord::Schema.define(version: 2021_03_31_114151) do
     t.text "description"
     t.datetime "viewed_at", default: "2021-03-31 10:36:42"
     t.index ["notebook_id"], name: "index_notables_on_notebook_id"
-  end
-
-  create_table "notables_notes", force: :cascade do |t|
-    t.bigint "notable_id", null: false
-    t.bigint "note_id", null: false
-    t.index ["notable_id"], name: "index_notables_notes_on_notable_id"
-    t.index ["note_id"], name: "index_notables_notes_on_note_id"
   end
 
   create_table "notebooks", force: :cascade do |t|
@@ -64,9 +64,9 @@ ActiveRecord::Schema.define(version: 2021_03_31_114151) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "notable_notes", "notables"
+  add_foreign_key "notable_notes", "notes"
   add_foreign_key "notables", "notebooks"
-  add_foreign_key "notables_notes", "notables"
-  add_foreign_key "notables_notes", "notes"
   add_foreign_key "notebooks", "users"
   add_foreign_key "notes", "notebooks"
 end
