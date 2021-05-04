@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 class Notable < ApplicationRecord
-  has_and_belongs_to_many :notes
+  before_destroy :destroy_notes
+
+  has_many :notable_notes, dependent: :destroy
+  has_many :notes, through: :notable_notes
   belongs_to :notebook
 
   validate :permitted_type
@@ -19,5 +22,9 @@ class Notable < ApplicationRecord
 
   def permitted_type
     errors.add(:type, "must be one of #{TYPES.join('/')}") unless TYPES.include?(type)
+  end
+
+  def destroy_notes
+    notes.map(&:destroy)
   end
 end
