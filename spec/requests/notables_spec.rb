@@ -439,14 +439,24 @@ RSpec.describe '/api/v1/notebooks/:id/notables', type: :request do
     end
 
     context 'when signed in' do
+      let!(:note_1) { FactoryBot.create(:note, notebook: notebook_1, content: "#{item.text_code} #{location.text_code}") }
+      let!(:note_2) { FactoryBot.create(:note, notebook: notebook_1, content: "#{item.text_code} #{character.text_code}") }
+      let!(:note_3) { FactoryBot.create(:note, notebook: notebook_1, content: "#{location.text_code} #{character.text_code}") }
+
       before do
         post user_session_url, as: :json, params: { user: { email: user.email, password: 'superSecret123!' } }
       end
 
-      it 'destroys only the requested note' do
+      it 'destroys the requested notable' do
         expect do
           delete api_v1_notebook_notable_url(notebook_1, item), as: :json
         end.to change(notebook_1.notables, :count).by(-1)
+      end
+
+      it 'destroys linked notes' do
+        expect do
+          delete api_v1_notebook_notable_url(notebook_1, item), as: :json
+        end.to change(Note, :count).by(-2)
       end
     end
   end

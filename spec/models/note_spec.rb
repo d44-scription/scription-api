@@ -360,4 +360,34 @@ RSpec.describe Note, type: :model do
       end
     end
   end
+
+  context 'when being destroyed' do
+    let!(:item) { FactoryBot.create(:item, notebook: notebook) }
+
+    before do
+      note.update(content: item.text_code)
+    end
+
+    it 'destroys correctly' do
+      expect do
+        note.destroy
+      end.to change(Note, :count).by(-1)
+    end
+
+    it 'does not destroy linked notables' do
+      expect(item.notes.count).to eql(1)
+
+      expect do
+        note.destroy
+      end.to change(Notable, :count).by(0)
+    end
+
+    it 'destroys linked relationships' do
+      expect(item.notes.count).to eql(1)
+
+      expect do
+        note.destroy
+      end.to change(item.notes, :count).by(-1)
+    end
+  end
 end
