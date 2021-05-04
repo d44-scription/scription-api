@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class Notable < ApplicationRecord
-  has_and_belongs_to_many :notes
+  has_many :notable_notes
+  has_many :notes, through: :notable_notes
   belongs_to :notebook
 
   validate :permitted_type

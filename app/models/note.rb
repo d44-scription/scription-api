@@ -2,7 +2,8 @@
 
 class Note < ApplicationRecord
   belongs_to :notebook
-  has_and_belongs_to_many :notables
+  has_many :notable_notes
+  has_many :notables, through: :notable_notes
 
   TRIGGERS = [Item::TRIGGER, Character::TRIGGER, Location::TRIGGER].freeze
   CHARACTER_LIMIT = 1000
