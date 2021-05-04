@@ -2,7 +2,7 @@
 
 class Note < ApplicationRecord
   belongs_to :notebook
-  has_many :notable_notes
+  has_many :notable_notes, dependent: :destroy
   has_many :notables, through: :notable_notes
 
   TRIGGERS = [Item::TRIGGER, Character::TRIGGER, Location::TRIGGER].freeze
@@ -10,9 +10,9 @@ class Note < ApplicationRecord
 
   validates :notebook, presence: true
   validates :content, presence: true, length: { in: 5..CHARACTER_LIMIT }
+  validates :order_index, presence: true, uniqueness: { scope: :notebook }
   validate :link_notables
   validate :forbidden_characters
-  validates :order_index, presence: true, uniqueness: { scope: :notebook }
 
   before_validation(on: :create) { set_order_index }
 
