@@ -16,10 +16,10 @@ $ docker-compose build
   > Successfully tagged scription-web_web:latest
 ```
 
-to build all containers. Then you'll need to host the containers locally using:
+to build all containers. Then you'll need to host the containers. Run the db in a separate, detached container to simplify output:
 
 ```bash
-$ docker-compose up db
+$ docker-compose up -d db
   > ...
   > Creating scription-web_db_1 ... done
 
