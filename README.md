@@ -16,7 +16,32 @@ $ docker-compose build
   > Successfully tagged scription-web_web:latest
 ```
 
-to build all containers. Then you'll need to host the containers. Run the db in a separate, detached container to simplify output:
+Seed data is provided, and can be initialised by running:
+
+```bash
+  $ dcr --rm web bin/rails db:setup
+  > ...
+  > Creating User
+  > Creating notebook 0
+  >   Creating item for Notebook 0
+  >   Creating character for Notebook 0
+  >   Creating location for Notebook 0
+  >   Creating linked notes for Notebook 0
+  > Creating notebook 1
+  >   Creating item for Notebook 1
+  >   Creating character for Notebook 1
+  >   Creating location for Notebook 1
+  >   Creating linked notes for Notebook 1
+  > Creating notebook 2
+  >   Creating item for Notebook 2
+  >   Creating character for Notebook 2
+  >   Creating location for Notebook 2
+  >   Creating linked notes for Notebook 2
+```
+
+This will create a user with the email `admin@example.com` and password `superSecret123!` with rudimentary data. These credentials can be used to authenticate on the web and mobile applications.
+
+Then you'll need to start the containers. Run `db` in a separate, detached container to simplify output, then run the `web` container in the main terminal window:
 
 ```bash
 $ docker-compose up -d db
