@@ -1,8 +1,12 @@
-# COMP3000-scription-api
+# Scription API
 
-API for the Scription application
+## Pipeline
 
-## Running locally
+This application uses a simplified version of Git-Flow to prevent environment variables being baked into the production environment. All new development should be branched off `develop`, which will automatically deploy to the staging server once merged. When changes have been tested, they should be merged into `main` which will deploy to production.
+
+All tests are run on PR to develop or main branches using GitHub actions. Any failures will be flagged & should not be merged.
+
+## Running Locally
 
 The application is Dockerised, so should be fairly standard. Clone the repo and, when in the apps directory, run:
 
@@ -12,10 +16,35 @@ $ docker-compose build
   > Successfully tagged scription-web_web:latest
 ```
 
-to build all containers. Then you'll need to host the containers locally using:
+Seed data is provided, and can be initialised by running:
 
 ```bash
-$ docker-compose up db
+  $ dcr --rm web bin/rails db:setup
+  > ...
+  > Creating User
+  > Creating notebook 0
+  >   Creating item for Notebook 0
+  >   Creating character for Notebook 0
+  >   Creating location for Notebook 0
+  >   Creating linked notes for Notebook 0
+  > Creating notebook 1
+  >   Creating item for Notebook 1
+  >   Creating character for Notebook 1
+  >   Creating location for Notebook 1
+  >   Creating linked notes for Notebook 1
+  > Creating notebook 2
+  >   Creating item for Notebook 2
+  >   Creating character for Notebook 2
+  >   Creating location for Notebook 2
+  >   Creating linked notes for Notebook 2
+```
+
+This will create a user with the email `admin@example.com` and password `superSecret123!` with rudimentary data. These credentials can be used to authenticate on the web and mobile applications.
+
+Then you'll need to start the containers. Run `db` in a separate, detached container to simplify output, then run the `web` container in the main terminal window:
+
+```bash
+$ docker-compose up -d db
   > ...
   > Creating scription-web_db_1 ... done
 
@@ -35,7 +64,7 @@ $ docker-compose up web
 
 The API is now hosted at `localhost:3000`, so point other applications to this.
 
-## Linting Code
+## Formatting Code
 
 This app uses [Rubocop](https://github.com/rubocop-hq/rubocop) for linting. To check for offences use:
 
